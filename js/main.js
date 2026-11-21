@@ -1,137 +1,83 @@
 (function () {
   'use strict';
-  var $ = function (s, c) { return (c || document).querySelector(s); };
-  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
-  var rnd = function (a, b) { return a + Math.random() * (b - a); };
+  var root = document.documentElement;
+  root.classList.add('js');
+  var $ = function (s) { return document.querySelector(s); };
   var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- 1. Cạnh giấy xé ngẫu nhiên (trên + dưới) ---------- */
-  function tornPoly(amp, n) {
-    var pts = [], i, x;
-    for (i = 0; i <= n; i++) {
-      x = (i / n * 100).toFixed(2);
-      pts.push(x + '% ' + rnd(0, amp).toFixed(1) + 'px');
-    }
-    for (i = n; i >= 0; i--) {
-      x = (i / n * 100).toFixed(2);
-      pts.push(x + '% calc(100% - ' + rnd(0, amp).toFixed(1) + 'px)');
-    }
-    return 'polygon(' + pts.join(',') + ')';
+  // Câu kết: tách từng chữ để hiện chậm
+  var big = $('.end .big');
+  if (big) {
+    var txt = big.textContent.trim();
+    big.setAttribute('aria-label', txt);
+    big.innerHTML = txt.split(/\s+/).map(function (w, i) {
+      return '<span class="w" aria-hidden="true" style="--i:' + i + '">' + w + '</span>';
+    }).join(' ');
   }
-  $$('.torn').forEach(function (el) {
-    var amp = parseFloat(el.getAttribute('data-amp')) || 8;
-    el.style.clipPath = tornPoly(amp, 70);
-    el.style.webkitClipPath = el.style.clipPath;
-  });
 
-  /* ---------- 2. Cánh cửa xé đôi (cạnh dọc) ---------- */
-  function doorPoly(side, amp, n) {
-    var pts = [], i, y, off;
-    if (side === 'l') {
-      pts.push('0 0');
-      for (i = 0; i <= n; i++) {
-        y = (i / n * 100).toFixed(2);
-        off = rnd(0, amp).toFixed(1);
-        pts.push('calc(100% - ' + off + 'px) ' + y + '%');
+  // Hiện dần khi cuộn tới
+  var rv = [].slice.call(document.querySelectorAll('.rv'));
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+  rv.forEach(function (el) { io.observe(el); });
+
+  // Mục lục chương + chớp mờ khi sang chương mới
+  var secs = [].slice.call(document.querySelectorAll('[data-fg]'));
+  var links = [].slice.call(document.querySelectorAll('#rail a'));
+  var rail = $('#rail');
+  var blink = $('.blink');
+  var last = -1;
+  var so = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var i = secs.indexOf(e.target);
+      links.forEach(function (a, k) { a.classList.toggle('on', k === i); });
+      rail.style.setProperty('--rf', e.target.getAttribute('data-fg'));
+      if (last !== -1 && last !== i && !reduce && blink) {
+        blink.classList.remove('go'); void blink.offsetWidth; blink.classList.add('go');
       }
-      pts.push('0 100%');
-    } else {
-      pts.push('100% 0');
-      pts.push('100% 100%');
-      for (i = n; i >= 0; i--) {
-        y = (i / n * 100).toFixed(2);
-        off = rnd(0, amp).toFixed(1);
-        pts.push(off + 'px ' + y + '%');
-      }
-    }
-    return 'polygon(' + pts.join(',') + ')';
+      last = i;
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  secs.forEach(function (s) { so.observe(s); });
+
+  // Thanh cảm xúc: dải màu theo vị trí thật của từng chương
+  var emo = $('#emo');
+  var cols = ['#B4531A', '#6E1A14', '#3A2418', '#0B0807', '#41533A', '#F1E8D4'];
+  function buildEmo() {
+    var H = root.scrollHeight;
+    var stops = secs.map(function (s, i) {
+      return cols[i] + ' ' + ((s.offsetTop + s.offsetHeight / 2) / H * 100).toFixed(1) + '%';
+    });
+    emo.style.background = 'linear-gradient(180deg,' + cols[0] + ' 0%,' + stops.join(',') + ',' + cols[5] + ' 100%)';
   }
-  $$('.torn-door').forEach(function (el) {
-    var p = doorPoly(el.getAttribute('data-side'), 26, 30);
-    el.style.clipPath = p;
-    el.style.webkitClipPath = p;
-  });
 
-  /* ---------- 3. Cuộn: cửa mở + thanh tiến độ ---------- */
-    var doorL = $('.door-l'), doorR = $('.door-r'), doorText = $('.door-text');
-  var reveal = $('.hero-reveal'), content = $('.hero-content');
-  var bar = $('.progress i');
+  // Hiệu ứng gắn với mức cuộn: hạt phim, vignette chương III, bình minh chương V
+  var ch3 = $('#c3'), ch5 = $('#c5');
   var ticking = false;
-
-  function onScroll() {
+  function update() {
     var vh = window.innerHeight;
-    var t = clamp(window.scrollY / (vh * 0.9), 0, 1);
-
-    // Giai đoạn 1 (0 → 0.28): chữ mờ dần, đường xé nổi lên
-    var fade = clamp(t / 0.28, 0, 1);
-    doorText.style.opacity = (1 - fade).toFixed(3);
-    doorText.style.filter = 'blur(' + (fade * 8).toFixed(1) + 'px)';
-    doorText.style.transform = 'scale(' + (1 + fade * 0.06).toFixed(3) + ')';
-    var seam = (0.15 + 0.85 * fade).toFixed(3);
-    doorL.style.setProperty('--seam', seam);
-    doorR.style.setProperty('--seam', seam);
-
-    // Giai đoạn 2 (0.2 → 1): hai nửa mở ra
-    var o = clamp((t - 0.2) / 0.8, 0, 1);
-    var e = o * o * (3 - 2 * o);
-    doorL.style.transform = 'translateX(' + (-e * 106) + '%) rotate(' + (-e * 5) + 'deg)';
-    doorR.style.transform = 'translateX(' + (e * 106) + '%) rotate(' + (e * 5) + 'deg)';
-    var vis = t >= 1 ? 'hidden' : 'visible';
-    doorL.style.visibility = vis; doorR.style.visibility = vis;
-    doorText.style.visibility = fade >= 1 ? 'hidden' : 'visible';
-    reveal.style.transform = 'scale(' + (1.12 - 0.12 * e) + ')';
-    content.style.opacity = (0.15 + 0.85 * e).toFixed(3);
-    content.style.transform = 'translateY(' + (40 * (1 - e)).toFixed(1) + 'px)';
-
-    var max = document.documentElement.scrollHeight - vh;
-    bar.style.height = (max > 0 ? clamp(window.scrollY / max, 0, 1) * 100 : 0) + '%';
+    var max = Math.max(1, root.scrollHeight - vh);
+    var P = clamp(window.scrollY / max, 0, 1);
+    emo.style.setProperty('--ep', (1 + P * 98).toFixed(2) + '%');
+    root.style.setProperty('--grain', (reduce ? 0 : 0.32 * (1 - clamp(P / 0.92, 0, 1))).toFixed(3));
+    if (!reduce) {
+      var r3 = ch3.getBoundingClientRect();
+      var p3 = clamp((vh - r3.top) / (r3.height + vh), 0, 1);
+      root.style.setProperty('--v', clamp((p3 - 0.1) / 0.6, 0, 1).toFixed(3));
+      root.style.setProperty('--vo', (clamp(p3 / 0.12, 0, 1) * clamp((1 - p3) / 0.12, 0, 1)).toFixed(3));
+      var r5 = ch5.getBoundingClientRect();
+      ch5.style.setProperty('--dawn', clamp((vh - r5.top) / (r5.height * 0.6 + vh * 0.5), 0, 1).toFixed(3));
+    }
     ticking = false;
   }
-  window.addEventListener('scroll', function () {
-    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
-  }, { passive: true });
-  window.addEventListener('resize', onScroll);
-  onScroll();
-
-  /* ---------- 4. Hiện dần khi cuộn tới ---------- */
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-    });
-  }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
-  $$('.reveal, .fly').forEach(function (el) { io.observe(el); });
-
-  /* ---------- 5. Video tự phát khi vào khung nhìn ---------- */
-  var vio = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      var v = en.target;
-      if (en.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
-      else v.pause();
-    });
-  }, { threshold: 0.4 });
-  $$('video[data-autoplay]').forEach(function (v) { vio.observe(v); });
-
-  // Video chính: tạm dừng khi cuộn ra khỏi khung
-  var main = $('.film video');
-  if (main) {
-    new IntersectionObserver(function (en) {
-      if (!en[0].isIntersecting) main.pause();
-    }, { threshold: 0.1 }).observe(main);
-  }
-
-  /* ---------- 6. Thẻ lật ---------- */
-  $$('.flip').forEach(function (b) {
-    b.addEventListener('click', function () {
-      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
-    });
-  });
-
-  /* ---------- 7. Thanh kéo "hôm nay / mai sau" ---------- */
-  var cmp = $('#cmp');
-  if (cmp) {
-    var range = $('input', cmp);
-    var set = function (v) { cmp.style.setProperty('--pos', v + '%'); };
-    range.addEventListener('input', function () { set(range.value); });
-    set(range.value);
-  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () { buildEmo(); onScroll(); });
+  window.addEventListener('load', function () { buildEmo(); update(); });
+  buildEmo(); update();
 })();
