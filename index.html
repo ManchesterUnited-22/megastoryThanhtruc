@@ -10,14 +10,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-tone="blood">
 
 <!-- ===== SÂN KHẤU CỐ ĐỊNH: mỗi .layer là một "cảnh" (ảnh hoặc video) =====
      Đổi file ở src tuỳ ý. Thiếu file thì hiện nền màu --bg thay thế.
      data-cap = chú thích hiện ở góc dưới khi cảnh đó đang hiển thị. -->
 <div class="stage" id="stage" aria-hidden="true">
 
-    <div class="layer" style="--bg:#2e2016" data-cap="Mở đầu · chú thích video">
+    
     <img src="assets/images/hero.jpg" alt="" onerror="this.remove()">
     <video src="assets/video/intro.mp4" muted loop playsinline preload="auto" onerror="this.remove()"></video>
   </div>
@@ -80,17 +80,65 @@
 <main>
 
   <!-- ============ MỞ ĐẦU: video toàn màn hình + 50+ năm ============ -->
-    <section class="chapter" id="mo-dau">
-    <div class="cover film" data-scene="0">
-      <div class="eyebrow rv">Megastory <i></i> Chương mở đầu</div>
-      <h1 class="rv doc">Những mảnh đời sau cánh cửa <small>trung tâm chăm sóc trẻ em chất độc da cam</small></h1>
-      <a class="cue" href="#timeline"><b>↓</b> Bốn chương · cuộn để đọc</a>
+    <section class="chapter" id="mo-dau" data-tone="blood">
+       <div class="opening" id="opening" data-scene="0">
+
+      <!-- PHÍA SAU CỬA: trái = khung ảnh, phải = nội dung -->
+      <div class="op-img">
+        <div class="op-frame" data-label="Khung ảnh mở đầu · đặt ảnh tại assets/images/open.jpg">
+          <img src="assets/images/open.jpg" alt="" onerror="this.remove()">
+        </div>
+         <p class="op-cap op-item" style="--d:2s"><span>Nguồn: huengaynay.vn </span></p>
+      </div>
+      <div class="op-txt">
+        <p class="op-lead op-item" style="--d:1.2s">Chiến tranh đã kết thúc hơn nửa thế kỷ, nhưng hậu quả của chất độc da cam vẫn chưa dừng lại. Tại những trung tâm chăm sóc trẻ em bị ảnh hưởng bởi chất độc da cam, cuộc chiến với bệnh tật, những khiếm khuyết về sức khỏe và nỗi lo tương lai vẫn diễn ra mỗi ngày. Ở đó, từng bữa ăn, giờ tập luyện và sự chăm sóc thường nhật đều là một phần trong hành trình giúp các em có cuộc sống tốt hơn.</p>
+        <a class="cue op-item" style="--d:1.8s" href="#timeline"><b>↓</b> Bốn chương · cuộn để đọc</a>
+      </div>
+
+      <!-- HAI CÁNH CỬA: tiêu đề nằm trên cửa, mở ra thì chữ tách đôi theo hai cánh -->
+      <div class="op-door l">
+        <div class="dt">
+          <div class="eyebrow">Megastory <i></i> Chương mở đầu</div>
+          <h1 class="dt-h1"><span>Những mảnh đời</span><span>sau cánh cửa</span></h1>
+          <p class="dt-sub">trung tâm chăm sóc trẻ em chất độc da cam</p>
+        </div>
+      </div>
+      <div class="op-door r" aria-hidden="true">
+        <div class="dt">
+          <div class="eyebrow">Megastory <i></i> Chương mở đầu</div>
+          <div class="dt-h1"><span>Những mảnh đời</span><span>sau cánh cửa</span></div>
+          <p class="dt-sub">trung tâm chăm sóc trẻ em chất độc da cam</p>
+        </div>
+      </div>
+
     </div>
 
     <!-- ĐIỂM NHẤN: dòng thời gian theo các mốc rải chất độc -->
     <div class="step tl-wrap" id="timeline" data-scene="0" data-mood="dim">
       <div class="tl-stick">
-        <div class="tl-kick">Mốc thời gian</div>
+                 <div class="tl-map" id="tlMap" aria-hidden="true">
+          <svg class="map-svg" viewBox="-6 -6 298 612">
+            <defs>
+              <path id="vnShape" d="M228,75 L222,75 L215,80 L206,84 L204,93 L197,97 L193,95 L186,97 L178,95 L181,106 L173,115 L174,120 L172,124 L158,136 L151,138 L144,153 L143,165 L140,171 L137,174 L137,178 L147,197 L154,204 L161,208 L171,219 L169,222 L170,229 L166,228 L172,231 L180,243 L195,256 L197,262 L212,272 L212,274 L222,282 L223,285 L231,285 L238,295 L240,295 L241,299 L252,315 L262,324 L266,339 L272,351 L272,357 L280,386 L280,389 L278,386 L279,409 L285,422 L286,437 L282,431 L277,435 L280,445 L277,444 L277,458 L279,463 L278,465 L276,461 L275,468 L276,472 L274,477 L270,478 L268,488 L262,489 L257,494 L251,495 L240,504 L233,506 L230,513 L223,514 L201,526 L198,523 L194,522 L191,516 L188,526 L187,527 L183,525 L180,521 L175,524 L180,524 L182,527 L181,530 L169,530 L180,535 L182,538 L177,543 L177,546 L175,548 L169,545 L157,533 L171,550 L174,557 L170,560 L166,560 L159,556 L148,544 L145,542 L158,559 L159,563 L158,567 L132,579 L125,591 L117,598 L108,600 L103,599 L108,593 L105,591 L106,558 L108,550 L116,546 L116,545 L113,540 L107,538 L105,534 L99,536 L90,526 L95,521 L106,521 L114,514 L114,505 L125,508 L128,504 L142,502 L146,507 L149,506 L158,510 L156,505 L158,500 L146,490 L146,476 L148,475 L152,471 L167,474 L168,463 L179,462 L181,459 L188,458 L199,449 L203,448 L206,451 L210,446 L212,439 L209,419 L214,403 L203,375 L205,365 L208,361 L211,353 L209,340 L216,329 L212,323 L201,314 L197,307 L206,301 L206,297 L188,284 L185,278 L180,280 L177,279 L173,272 L171,260 L162,249 L152,241 L139,228 L135,218 L130,211 L125,210 L117,201 L116,197 L118,191 L101,185 L69,164 L76,157 L74,149 L83,149 L96,151 L102,146 L105,140 L109,135 L109,133 L106,128 L100,128 L97,121 L88,118 L94,113 L96,110 L77,98 L69,101 L62,107 L59,108 L38,100 L28,85 L32,68 L28,65 L27,63 L24,68 L21,68 L18,59 L14,56 L0,39 L13,24 L27,31 L33,36 L39,33 L39,31 L47,23 L53,31 L58,23 L71,33 L75,24 L79,22 L81,22 L85,26 L88,26 L94,22 L100,21 L104,18 L107,8 L123,0 L129,4 L134,11 L139,13 L145,17 L151,15 L157,15 L162,20 L173,18 L182,23 L179,29 L174,31 L173,34 L173,41 L177,45 L177,56 L180,55 L189,58 L193,63 L197,66 L201,66 L204,71 L207,69 L209,71 L215,70 L220,69 L228,75Z"/>
+              <clipPath id="vnClip"><use href="#vnShape"/></clipPath>
+              <clipPath id="southClip"><rect x="-10" y="258" width="310" height="360"/></clipPath>
+            </defs>
+            <use href="#vnShape" class="map-outline"/>
+            <g clip-path="url(#vnClip)"><g clip-path="url(#southClip)">
+              <rect id="mapSouth" class="map-south" x="-10" y="258" width="310" height="360"/>
+            </g></g>
+            <line class="map-17" x1="120" y1="258" x2="290" y2="258"/>
+            <text class="map-txt" x="114" y="262" text-anchor="end">vĩ tuyến 17</text>
+            <circle class="map-pulse" cx="223" cy="353" r="3"/>
+            <circle class="map-dot" cx="223" cy="353" r="3.5"/>
+            <text class="map-txt" x="214" y="357" text-anchor="end">Kon Tum – Đắk Tô · 1961</text>
+          </svg>
+          <div class="map-count">
+            <div class="mc-num" id="mcNum">0</div>
+            <div class="mc-unit" id="mcUnit">triệu lít</div>
+            <div class="mc-label" id="mcLabel">chất diệt cỏ đã rải xuống miền Nam (ước tính)</div>
+          </div>
+        </div>
         <div class="tl-year" id="tlYear">1961</div>
 
         <div class="tl-events">
@@ -117,15 +165,11 @@
       </div>
     </div>
 
-    <div class="step left" data-scene="0">
-      <div class="card rv">
-        <p>Chiến tranh đã kết thúc hơn nửa thế kỷ, nhưng hậu quả của chất độc da cam vẫn chưa dừng lại. Tại những trung tâm chăm sóc trẻ em bị ảnh hưởng bởi chất độc da cam, cuộc chiến với bệnh tật, những khiếm khuyết về sức khỏe và nỗi lo tương lai vẫn diễn ra mỗi ngày. Ở đó, từng bữa ăn, giờ tập luyện và sự chăm sóc thường nhật đều là một phần trong hành trình giúp các em có cuộc sống tốt hơn.</p>
-      </div>
-    </div>
+    
   </section>
 
   <!-- ============ CHƯƠNG I: chữ sáng dần theo cuộn ============ -->
-  <section class="chapter" id="c1">
+  <section class="chapter" id="c1" data-tone="red">
     <div class="cover" data-scene="1">
       <div class="kick rv">Chương</div>
       <div class="numeral rv">I</div>
@@ -160,7 +204,7 @@
   </section>
 
   <!-- ============ CHƯƠNG II: dải cảnh lặp lại ============ -->
-  <section class="chapter" id="c2">
+  <section class="chapter" id="c2" data-tone="amber">
     <div class="cover" data-scene="3">
       <div class="kick rv">Chương</div>
       <div class="numeral rv">II</div>
@@ -227,7 +271,7 @@
   </section>
 
   <!-- ============ CHƯƠNG III: đèn pin trong bóng tối ============ -->
-  <section class="chapter" id="c3">
+  <section class="chapter" id="c3" data-tone="crimson">
     <div class="cover" data-scene="5">
       <div class="kick rv">Chương</div>
       <div class="numeral rv">III</div>
@@ -291,7 +335,7 @@
   </section>
 
   <!-- ============ CHƯƠNG IV: ba mảnh ghép thành khung ảnh ============ -->
-  <section class="chapter" id="c4">
+  <section class="chapter" id="c4" data-tone="orange">
     <div class="cover" data-scene="7">
       <div class="kick rv">Chương</div>
       <div class="numeral rv">IV</div>
@@ -348,7 +392,7 @@
   </section>
 
   <!-- ============ KHÉP LẠI: bình minh rồi khoảng lặng ============ -->
-  <section class="chapter" id="c5">
+  <section class="chapter" id="c5" data-tone="sunrise">
     <div class="step dawn-wrap" id="dawnWrap" data-scene="9" data-mood="dawn">
       <div class="dawn-stick">
         <div class="endwrap">

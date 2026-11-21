@@ -457,8 +457,6 @@ body[data-mood="fog"] .shade::after{opacity:.15}
   --blood:#7A1F18;    /* đỏ thẫm */
   --title:'Playfair Display','Newsreader',Georgia,serif;
 }
-#c3{--accent:#D86A52}   /* chương nỗi lo: ngả đỏ hơn */
-#c4{--accent:#E8793F}
 
 /* ---------- Khí quyển ấm: chút than hồng ở chân màn hình, viền tối ngả đỏ thẫm ---------- */
 .shade{background:
@@ -562,3 +560,187 @@ mark{box-shadow:inset 0 -.2em 0 rgba(184,58,43,.38)}
   .slot{aspect-ratio:4/3;width:min(100%,calc(32svh * 1.333))}
   .fog-frame figcaption{width:min(100%,calc(32svh * 1.333));text-align:center}
 }
+/* =====================================================
+   BẢN 5: màu theo tâm trạng từng chương · mở đầu chia đôi
+   Muốn chỉnh màu: sửa 6 khối [data-tone="..."] bên dưới.
+   --tone-a = màu sáng (chữ, số La Mã, thanh)  --tone-b = màu đậm (viền, thanh tiến độ)
+   --tint = lớp phủ màu lên ảnh nền  --glow = than hồng ở chân màn hình  --vig = viền tối
+   ===================================================== */
+@property --tone-a{syntax:'<color>';inherits:true;initial-value:#E07A3C}
+@property --tone-b{syntax:'<color>';inherits:true;initial-value:#B83A2B}
+@property --tint{syntax:'<color>';inherits:true;initial-value:rgba(0,0,0,0)}
+@property --glow{syntax:'<color>';inherits:true;initial-value:rgba(176,58,30,.26)}
+@property --vig{syntax:'<color>';inherits:true;initial-value:rgba(30,6,4,.62)}
+
+body{transition:--tone-a 1.4s ease,--tone-b 1.4s ease,--tint 1.4s ease,--glow 1.4s ease,--vig 1.4s ease}
+
+/* Mở đầu · chiến tranh hóa học: đỏ máu, nặng nhất */
+[data-tone="blood"]{--tone-a:#E4553A;--tone-b:#A3281C;--tint:rgba(96,14,10,.38);--glow:rgba(190,50,28,.30);--vig:rgba(40,5,4,.68);--accent:var(--tone-a)}
+/* I · di chứng, mất mát: đỏ gạch */
+[data-tone="red"]{--tone-a:#E26A4A;--tone-b:#B8382C;--tint:rgba(110,24,14,.30);--glow:rgba(200,70,34,.26);--vig:rgba(34,6,4,.62);--accent:var(--tone-a)}
+/* II · kiên trì, ấm: cam hổ phách */
+[data-tone="amber"]{--tone-a:#F2A55E;--tone-b:#D9692F;--tint:rgba(130,66,18,.26);--glow:rgba(224,122,60,.30);--vig:rgba(36,14,4,.58);--accent:var(--tone-a)}
+/* III · nỗi lo, mờ dần: đỏ thẫm ngả tím, lạnh hơn */
+[data-tone="crimson"]{--tone-a:#D9604D;--tone-b:#9A2B35;--tint:rgba(64,8,22,.40);--glow:rgba(150,30,40,.26);--vig:rgba(26,4,10,.70);--accent:var(--tone-a)}
+/* IV · trách nhiệm, hành động: cam sáng, bắt đầu có hy vọng */
+[data-tone="orange"]{--tone-a:#F4A860;--tone-b:#E07A3C;--tint:rgba(150,78,22,.22);--glow:rgba(238,140,66,.32);--vig:rgba(40,16,6,.55);--accent:var(--tone-a)}
+/* Khép lại · bình minh: vàng cam */
+[data-tone="sunrise"]{--tone-a:#FFC47A;--tone-b:#E26E3C;--tint:rgba(0,0,0,0);--glow:rgba(255,170,90,.20);--vig:rgba(40,12,6,.50);--accent:var(--tone-a)}
+
+/* Lớp khí quyển đổi màu theo chương */
+.shade{background:
+  radial-gradient(ellipse 90% 55% at 50% 118%,var(--glow),transparent 70%),
+  linear-gradient(to bottom,rgba(14,7,5,.38),rgba(14,7,5,.15) 40%,rgba(14,7,5,.58))}
+.vignette{background:radial-gradient(ellipse at center,transparent 45%,var(--vig) 100%)}
+.vignette::before{content:"";position:absolute;inset:0;background:var(--tint)}  /* nằm trên lớp tối "dim" nên màu luôn thấy rõ */
+
+/* Chi tiết ăn theo màu chương */
+.progress{background:linear-gradient(to right,var(--tone-a),var(--tone-b))}
+.eyebrow i{background:var(--tone-a)}
+.cue b,.rail a.on{color:var(--tone-a)}
+.numeral{background-image:linear-gradient(180deg,var(--tone-a) 0%,var(--tone-b) 100%)}
+.card{border-image:linear-gradient(to bottom,var(--tone-a),var(--tone-b)) 1}
+mark{box-shadow:inset 0 -.2em 0 rgba(184,58,43,.38);box-shadow:inset 0 -.2em 0 color-mix(in srgb,var(--tone-b) 45%,transparent)}
+.slot{border-color:rgba(240,161,95,.4);border-color:color-mix(in srgb,var(--tone-a) 45%,transparent)}
+.reveal .w.lit{text-shadow:0 0 26px rgba(255,214,170,.35);text-shadow:0 0 26px color-mix(in srgb,var(--tone-a) 50%,transparent)}
+.tl-kick,.tl-year,.tl-sum em{color:var(--tone-a)}
+.tl-year.after{color:#efe3d2}
+.s1{background:linear-gradient(to right,var(--tone-a),var(--tone-b))}
+.tl-facts > div{border-top-color:var(--tone-b)}
+.act::after{background:
+  linear-gradient(to top,rgba(184,58,43,.28),transparent 55%),
+  linear-gradient(to top,rgba(8,6,4,.88),rgba(8,6,4,.12) 55%,rgba(8,6,4,.4))}
+.act::after{background:
+  linear-gradient(to top,color-mix(in srgb,var(--tone-b) 32%,transparent),transparent 55%),
+  linear-gradient(to top,rgba(8,6,4,.88),rgba(8,6,4,.12) 55%,rgba(8,6,4,.4))}
+
+/* ---------- MỞ ĐẦU: hai cánh cửa kéo ra hai bên (tiêu đề nằm trên cửa) ---------- */
+.opening{
+  --ease:cubic-bezier(.76,0,.24,1);
+  position:relative;height:100svh;min-height:34rem;overflow:hidden;background:#0d0a08;
+}
+
+/* phía sau cửa: trái = ảnh, phải = nội dung */
+.op-img{
+  position:absolute;left:0;top:0;bottom:0;width:50%;overflow:hidden;
+  background:linear-gradient(135deg,#6a4a2e,#2f2216);
+}
+.op-frame{position:absolute;inset:0}
+.op-frame::before{
+  content:attr(data-label);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:1rem;text-align:center;font-size:.78rem;letter-spacing:.08em;line-height:1.6;color:rgba(246,239,230,.55);
+  background:repeating-linear-gradient(45deg,transparent 0 12px,rgba(255,255,255,.04) 12px 24px);
+}
+.op-frame img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transform:scale(1.14);transition:transform 2.8s var(--ease) .25s;
+}
+.opening.open .op-frame img{transform:none}
+.op-frame::after{
+  content:"";position:absolute;inset:clamp(10px,1.6vw,24px);pointer-events:none;
+  border:1px solid rgba(246,239,230,.10);
+  border:1px solid color-mix(in srgb,var(--tone-a) 14%,transparent);
+}
+.op-txt{
+  position:absolute;right:0;top:0;bottom:0;width:50%;
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  padding:0 clamp(3.6rem,6vw,6.5rem) 0 clamp(1.6rem,5vw,5.5rem);
+  background:
+    radial-gradient(ellipse 90% 60% at 85% 112%,var(--glow),transparent 70%),
+    linear-gradient(165deg,#1b0d09 0%,#110907 55%,#0d0a08 100%);
+}
+.op-lead{
+  margin:0;max-width:34rem;font-family:var(--serif);
+  font-size:clamp(1.05rem,1.5vw,1.35rem);line-height:1.8;color:var(--soft);
+}
+.op-item{opacity:0;transform:translateY(20px);transition:opacity 1s ease,transform 1s ease}
+.opening.open .op-item{opacity:1;transform:none;transition-delay:var(--d,0s)}
+
+/* hai cánh cửa: khép kín ở giữa, kéo trượt ra hai bên */
+.op-door{
+  position:absolute;top:0;bottom:0;width:50%;z-index:6;overflow:hidden;
+  background:#0b0807;
+  transition:transform 1.9s var(--ease) .25s;
+}
+.op-door.l{left:0;box-shadow:inset -1px 0 0 rgba(255,255,255,.08)}
+.op-door.r{right:0;box-shadow:inset 1px 0 0 rgba(255,255,255,.08)}
+.opening.open .op-door.l{transform:translateX(-101%)}
+.opening.open .op-door.r{transform:translateX(101%)}
+
+/* tiêu đề rộng bằng cả màn hình, mỗi cánh cửa chỉ lộ ra một nửa → ghép lại thành một khối */
+.dt{
+  position:absolute;top:0;bottom:0;width:200%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:0 clamp(1rem,4vw,4rem);
+}
+.op-door.l .dt{left:0}
+.op-door.r .dt{left:-100%}
+.dt .eyebrow{justify-content:center}
+.dt-h1{
+  margin:0;font-family:var(--title);font-weight:700;letter-spacing:-.01em;line-height:1.12;
+  font-size:clamp(2.4rem,6.6vw,6.6rem);
+}
+.dt-h1 span{display:block}
+.dt-sub{
+  margin:1.4rem 0 0;font-family:var(--sans);font-size:clamp(.78rem,1.1vw,.95rem);font-weight:500;
+  letter-spacing:.24em;text-transform:uppercase;line-height:1.7;color:var(--tone-a);
+}
+
+@media (max-width:720px){   /* điện thoại: ảnh trên, chữ dưới; cửa kéo lên và xuống */
+  .op-img{width:100%;height:42svh;bottom:auto}
+  .op-txt{left:0;top:auto;width:100%;height:58svh;padding:0 1.4rem}
+  .op-door{left:0;right:0;width:auto;height:50%}
+    .op-door.l{top:0;bottom:auto;box-shadow:inset 0 -1px 0 rgba(255,255,255,.05)}
+  .op-door.r{top:auto;bottom:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .op-door.l .dt{left:0;right:0;top:0;bottom:auto;width:auto;height:200%}
+  .op-door.r .dt{left:0;right:0;top:-100%;bottom:auto;width:auto;height:200%}
+  .dt-h1{font-size:clamp(2.2rem,11vw,3.4rem)}
+  .opening.open .op-door.l{transform:translateY(-101%)}
+  .opening.open .op-door.r{transform:translateY(101%)}
+}
+@media (prefers-reduced-motion:reduce){
+  .op-door,.op-frame img,.op-item{transition:none}
+}
+/* chỉ làm mềm đường viền giữa ảnh và chữ */
+.op-img::after{
+  content:"";position:absolute;top:0;right:0;bottom:0;width:clamp(1.5rem,4vw,3.5rem);z-index:2;pointer-events:none;
+  background:linear-gradient(to right,rgba(20,10,7,0),rgba(20,10,7,.85));
+}
+@media (max-width:720px){
+  .op-img::after{top:auto;left:0;width:auto;height:2rem;
+    background:linear-gradient(to bottom,rgba(20,10,7,0),rgba(20,10,7,.85))}
+}
+/* chú thích + nguồn ảnh mở đầu */
+.op-cap{
+  position:absolute;left:0;right:0;bottom:0;z-index:3;margin:0;
+  padding:2.6rem clamp(1.8rem,3.4vw,3rem) clamp(1.6rem,3vw,2.6rem);
+  background:linear-gradient(to top,rgba(10,6,4,.78),rgba(10,6,4,0));
+  font-size:.78rem;line-height:1.55;letter-spacing:.04em;color:var(--soft);
+}
+.op-cap span{color:rgba(246,239,230,.55)}
+/* bản đồ + con số lớn bên phải timeline */
+.tl-map{
+  position:absolute;right:clamp(3.8rem,7vw,7rem);top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;gap:clamp(1rem,2vw,2rem);
+}
+.map-svg{height:min(60svh,30rem);width:auto;flex:none;overflow:visible}
+.map-outline{fill:rgba(246,239,230,.04);stroke:rgba(246,239,230,.55);stroke-width:1.2;stroke-linejoin:round}
+.map-south{fill:var(--tone-a);opacity:0}
+.map-17{stroke:rgba(246,239,230,.4);stroke-width:1;stroke-dasharray:4 4}
+.map-txt{
+  font-family:var(--sans);font-size:13px;fill:var(--soft);
+  paint-order:stroke;stroke:rgba(10,6,4,.7);stroke-width:3px;
+}
+.map-dot{fill:#fff}
+.map-pulse{fill:none;stroke:var(--tone-a);stroke-width:1.5;transform-origin:223px 353px;animation:mapPulse 2s ease-out infinite}
+@keyframes mapPulse{from{transform:scale(1);opacity:.9}to{transform:scale(5);opacity:0}}
+.mc-num{
+  font-family:var(--serif);font-weight:300;line-height:1;
+  font-size:clamp(3.2rem,6vw,5.4rem);color:var(--tone-a);
+  font-variant-numeric:tabular-nums;text-shadow:0 4px 40px rgba(0,0,0,.6);
+}
+.mc-unit{margin-top:.4rem;font-size:1rem;color:var(--ink)}
+.mc-label{margin-top:.5rem;max-width:12rem;font-size:.82rem;line-height:1.5;color:var(--soft)}
+@media (min-width:1181px){.tl-bar{max-width:40rem}}   /* để thanh mốc không chạm bản đồ */
+@media (max-width:1180px){.tl-map{display:none}}
+@media (prefers-reduced-motion:reduce){.map-pulse{animation:none}}

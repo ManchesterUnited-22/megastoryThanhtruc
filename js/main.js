@@ -72,6 +72,7 @@
       links.forEach(function (a) {
         a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id);
       });
+      document.body.setAttribute('data-tone', e.target.getAttribute('data-tone') || 'blood');
     });
   }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
   document.querySelectorAll('.chapter').forEach(function (el) { railIO.observe(el); });
@@ -91,6 +92,7 @@
     else if (p < 0.74) { k = smooth((p - 0.44) / 0.30); year = 1971 + Math.round(55 * k); bar = SPLIT + (1 - SPLIT) * k; stage = 1; }
     else               { year = 2026; bar = 1; stage = 2; }
     tlYear.textContent = year;
+    updateMap(p);    
     tlYear.classList.toggle('after', year > 1971);
     seg1.style.width = (Math.min(bar, SPLIT) * 100) + '%';
     seg2.style.width = (Math.max(0, bar - SPLIT) * 100) + '%';
@@ -99,6 +101,25 @@
       tlStage = stage;
       tlEv.forEach(function (e, i) { e.classList.toggle('on', i === stage); });
     }
+  }
+    /* ---------- BẢN ĐỒ + CON SỐ LỚN ---------- */
+  var MAP_LIT = 80;    // triệu lít (số đang ghi trên trang)
+  var MAP_PPL = 4.8;   // triệu người
+  var mapSouth = $('mapSouth'), mcNum = $('mcNum'), mcUnit = $('mcUnit'), mcLabel = $('mcLabel');
+  var mapPhase = -1;
+  function updateMap(p) {
+    if (!mapSouth) return;
+    var fill, val, phase, k;
+    if (p < 0.05)      { fill = 0; val = 0; phase = 0; }
+    else if (p < 0.44) { k = clamp((p - 0.05) / 0.31, 0, 1); fill = k; val = MAP_LIT * k; phase = 0; }
+    else               { fill = 1; val = MAP_PPL * smooth((p - 0.44) / 0.30); phase = 1; }
+    if (phase !== mapPhase) {
+      mapPhase = phase;
+      mcUnit.textContent = phase ? 'triệu người' : 'triệu lít';
+      mcLabel.textContent = phase ? 'người Việt Nam bị phơi nhiễm (ước tính)' : 'chất diệt cỏ đã rải xuống miền Nam (ước tính)';
+    }
+    mcNum.textContent = phase ? val.toFixed(1).replace('.', ',') : Math.round(val);
+    mapSouth.style.opacity = (0.78 * fill).toFixed(3);
   }
 
   /* ---------- CHƯƠNG I: sáng từng chữ ---------- */
@@ -241,7 +262,19 @@
   addEventListener('resize', onScroll);
   addEventListener('load', update);
 
-  document.body.classList.add('film');
   setScene(0);
   update();
+
+  /* ---------- MỞ ĐẦU: chia đôi (ảnh sang trái, chữ sang phải) ---------- */
+  var opening = $('opening');
+  if (opening) {
+    var openIt = function () { opening.classList.add('open'); };
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      openIt();
+    } else {
+      var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+      var cap1 = new Promise(function (r) { setTimeout(r, 1800); });
+      Promise.race([fontsReady, cap1]).then(function () { setTimeout(openIt, 700); });
+    }
+  }
 })();
