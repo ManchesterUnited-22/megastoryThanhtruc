@@ -1,0 +1,25 @@
+MEGASTORY – NHỮNG MẢNH ĐỜI SAU CÁNH CỬA
+=========================================
+
+CÁCH CHẠY
+- Giải nén, bấm đúp index.html là xem được (cần internet để tải font chữ).
+- Muốn chạy như web thật: mở terminal trong thư mục này gõ
+      python -m http.server 8000
+  rồi vào http://localhost:8000
+
+CHỖ ĐẶT VIDEO / ẢNH (đặt đúng tên, không cần sửa code)
+assets/video/hero-bg.mp4     Video nền đầu trang (loop, không tiếng, nên 10–20s, nhẹ < 8MB)
+assets/video/story-main.mp4  VIDEO CHÍNH ở chương 02 (có nút play, có tiếng)
+assets/video/clip-1.mp4      Clip ngắn dán kiểu polaroid ở chương 01 (loop, không tiếng)
+assets/video/clip-2.mp4      Clip ngắn ở chương 04 (loop, không tiếng)
+assets/images/photo-1.jpg    Ảnh polaroid chương 01 (hiện đè lên clip-1; xóa ảnh nếu muốn dùng clip)
+assets/images/photo-2.jpg    Ảnh polaroid chương 04 (tương tự)
+assets/images/story-poster.jpg  Ảnh bìa cho video chính
+
+Chưa có file nào thì trang vẫn chạy, chỗ đó hiện khung giấy báo "đặt video/ảnh vào đây".
+Lưu ý: nên dùng .mp4 (H.264) để chạy được trên mọi trình duyệt/điện thoại.
+
+SỬA NỘI DUNG
+- Chữ nằm trong index.html (tìm đoạn cần sửa là thấy).
+- Màu sắc: đầu file css/style.css (mục :root).
+- Chú thích dưới ảnh: thẻ <figcaption>. Tên nhóm / nguồn ảnh: cuối index.html (footer).
