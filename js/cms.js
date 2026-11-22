@@ -599,7 +599,7 @@
 
       const extension = file.name.match(/\.[a-z0-9]{1,10}$/i)?.[0] || '';
       const path = 'megastory-editor/' + crypto.randomUUID() + extension;
-      const bucket = client.storage.from('megastory-media');
+      const bucket = client.storage.from('media');
       const { error } = await bucket.upload(path, file, { contentType: file.type, upsert: false });
       if (error) throw new Error('Không tải được ' + file.name + ': ' + error.message);
       uploaded.set(src, bucket.getPublicUrl(path).data.publicUrl);
