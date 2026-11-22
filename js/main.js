@@ -124,7 +124,9 @@
 
   /* ---------- CHƯƠNG I: sáng từng chữ ---------- */
   var revealWrap = $('revealWrap'), revealEl = $('reveal'), words = [];
-  if (revealEl) {
+  function buildReveal() {
+    if (!revealEl) return;
+    words = [];
     var raw = revealEl.textContent.trim().split(/\s+/);
     revealEl.textContent = '';
     raw.forEach(function (w, i) {
@@ -136,6 +138,8 @@
       words.push(s);
     });
   }
+  buildReveal();
+  window.__rebuildReveal = function () { buildReveal(); updateReveal(); };
   function updateReveal() {
     if (!revealWrap) return;
     var p = clamp((progressOf(revealWrap) - 0.08) / 0.8, 0, 1);
