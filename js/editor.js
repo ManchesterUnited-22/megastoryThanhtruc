@@ -21,9 +21,15 @@
       });
     } catch (err) { /* bỏ qua */ }
   }
-    // Editor này chỉ chạy trên máy bạn. Bản online giữ nguyên bảng cms.js cho bạn của bạn.
-  const local = location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(location.hostname);
-  if (!local) return;
+  killOldPanel();
+  const mo = new MutationObserver(killOldPanel);
+  mo.observe(document.body, { childList: true, subtree: true });
+  setTimeout(() => mo.disconnect(), 10000);
+
+  // Chỉ hiện khi mở local (file://, localhost) hoặc thêm ?edit vào địa chỉ. Người xem web thật không thấy.
+  const dev = /[?&]edit\b/.test(location.search) || location.protocol === 'file:' ||
+              ['localhost', '127.0.0.1'].includes(location.hostname);
+  if (!dev) return;
 
   const FONTS = [
     ['Font gốc', ''],
@@ -77,7 +83,6 @@
   .ed-dbtn.alt{background:#3a3a45}
   body.ed-on{-webkit-user-select:none;user-select:none}
   body.ed-on .rail{display:none!important}
-    body.ed-on #cmsBar,body.ed-on #cmsHL{display:none!important}
   body.ed-on .rv{opacity:1!important;transform:none!important;filter:none!important;visibility:visible!important}
   body.ed-on iframe{pointer-events:none!important}
   body.ed-on [contenteditable=true]{-webkit-user-select:text;user-select:text;outline:2px dashed #ffb020;outline-offset:3px;cursor:text}
