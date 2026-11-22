@@ -17,7 +17,7 @@
   var qa = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var each = function (o, f) { Object.keys(o || {}).forEach(function (k) { f(k, o[k]); }); };
   var state = { t: {}, s: {}, i: {}, y: {}, c: {} };
-  var sb = null, sel = null, pending = null, texts = {}, imgs = {}, imgKeys = [];
+  var sb = null, sel = null, pending = null, insertTo = null, texts = {}, imgs = {}, imgKeys = [], cards = {};
   var layers = qa('.layer');
 
   /* ---------- khóa (key) cho từng phần tử: đường đi trong cây HTML ---------- */
@@ -42,6 +42,7 @@
   if ($('reveal')) texts[keyOf($('reveal'))] = $('reveal');
   qa('img').forEach(function (im) { var k = keyOf(im); imgs[k] = im; im.dataset.orig = im.getAttribute('src') || ''; });
   imgKeys = Object.keys(imgs);
+    qa('.card').forEach(function (c) { cards[keyOf(c)] = c; });   // phải tính trước mọi lần chèn
 
   /* ---------- an toàn: chỉ cho phép vài thẻ định dạng, bỏ mọi thuộc tính ---------- */
   function clean(html) {
@@ -97,7 +98,26 @@
     syncYT(l);
   }
   layers.forEach(function (l) { new MutationObserver(function () { syncYT(l); }).observe(l, { attributes: true, attributeFilter: ['class'] }); });
-
+    function renderIns(list) {
+    qa('.cmsFig').forEach(function (f) { f.remove(); });
+    (list || []).forEach(function (it, n) {
+      var card = cards[it.k]; if (!card || !okUrl(it.u)) return;
+      var f = document.createElement('figure'); f.className = 'cmsFig';
+      var im = document.createElement('img'); im.src = it.u; im.alt = it.c || ''; im.loading = 'lazy';
+      var cp = document.createElement('figcaption'); cp.textContent = it.c || '';
+      f.appendChild(im); f.appendChild(cp);
+      if (EDIT) {
+        cp.contentEditable = 'true'; cp.spellcheck = false;
+        cp.addEventListener('input', function () { state.n[n].c = cp.textContent; im.alt = cp.textContent; dirty(); });
+        cp.addEventListener('keydown', function (e) { if (e.key === 'Enter') e.preventDefault(); });
+        cp.addEventListener('paste', function (e) { e.preventDefault(); document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain')); });
+        var x = document.createElement('button'); x.type = 'button'; x.className = 'cmsDel'; x.textContent = '✕ Xóa ảnh';
+        x.onclick = function () { if (!confirm('Xóa ảnh này khỏi trang?')) return; state.n.splice(n, 1); renderIns(state.n); dirty(); };
+        f.appendChild(x);
+      }
+      card.appendChild(f);
+    });
+  }
   function apply(d) {
     d = d || {};
     each(d.t, function (k, v) {
@@ -108,11 +128,15 @@
     each(d.i, setImg);
     each(d.y, function (k, v) { setYT(layers[+k], v); });
     each(d.c, function (k, v) { if (layers[+k] && typeof v === 'string') layers[+k].setAttribute('data-cap', v); });
+        renderIns(d.n);
+    if (window.CMSX_apply) window.CMSX_apply(d);
     if (window.__rebuildReveal) window.__rebuildReveal();
   }
 
   /* ---------- CSS thêm ---------- */
-  var css = '.layer iframe.yt{position:absolute;top:50%;left:50%;width:100vw;height:56.25vw;min-height:100vh;min-width:177.78vh;transform:translate(-50%,-50%);border:0;pointer-events:none}';
+  var css = '.layer iframe.yt{position:absolute;top:50%;left:50%;width:100vw;height:56.25vw;min-height:100vh;min-width:177.78vh;transform:translate(-50%,-50%);border:0;pointer-events:none}'+
+  '.cmsFig{margin:1.2rem 0 0;position:relative}.cmsFig img{display:block;width:100%;height:auto;max-height:55vh;object-fit:cover;border-radius:3px}' +
+    '.cmsFig figcaption{margin-top:.5rem;font-size:.85rem;font-style:italic;opacity:.8}.cmsFig figcaption:empty{display:none}';
   if (EDIT) css += '[contenteditable]{outline:1px dashed rgba(240,161,95,.0);cursor:text}[contenteditable]:hover{outline-color:rgba(240,161,95,.7)}[contenteditable]:focus{outline:2px solid #f0a15f}' +
     '#cmsBar,#cmsLogin form{font:13px/1.4 system-ui,sans-serif;color:#222;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.45)}' +
     '#cmsBar{position:fixed;top:12px;right:12px;width:270px;max-height:92vh;overflow:auto;z-index:99999;padding:12px}' +
@@ -122,6 +146,12 @@
     '#cmsBar .r{display:flex;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid #eee}#cmsBar .r span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
     '#cmsMsg{margin-top:6px;color:#b33}#cmsLogin{position:fixed;inset:0;z-index:99999;background:rgba(10,6,4,.9);display:flex;align-items:center;justify-content:center}' +
     '#cmsLogin form{display:flex;flex-direction:column;gap:8px;padding:22px;width:300px}';
+    '#cmsLogin form{display:flex;flex-direction:column;gap:8px;padding:22px;width:300px}' +
+    'body.cmsImg,body.cmsImg *{cursor:crosshair!important}body.cmsImg [contenteditable]{user-select:none}' +
+    'body.cmsImg #cmsBar,body.cmsImg #cmsBar *{cursor:auto!important}' +
+    '#cmsHL{position:fixed;z-index:99998;pointer-events:none;box-sizing:border-box;border:3px solid #f0a15f;background:rgba(240,161,95,.18)}';
+        'body.cmsIns,body.cmsIns *{cursor:copy!important}body.cmsIns [contenteditable]{user-select:none}body.cmsIns #cmsBar,body.cmsIns #cmsBar *{cursor:auto!important}' +
+    '.cmsFig figcaption:empty::before{content:"Bấm để nhập chú thích";opacity:.5}.cmsDel{margin-top:.4rem;font:12px system-ui;padding:3px 8px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#a22;cursor:pointer}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   /* ---------- CHẠY BÌNH THƯỜNG: đọc bản đã xuất bản ---------- */
@@ -129,7 +159,7 @@
     try { apply(JSON.parse(localStorage.getItem('cms_pub'))); } catch (e) {}
     var ctl = new AbortController(); setTimeout(function () { ctl.abort(); }, 5000);
     fetch(CFG.url + '/rest/v1/site_content?id=eq.published&select=data', {
-      headers: { apikey: CFG.key, Authorization: 'Bearer ' + CFG.key }, signal: ctl.signal
+      headers: { apikey: CFG.key }, signal: ctl.signal
     }).then(function (r) { return r.json(); }).then(function (rows) {
       var d = rows && rows[0] && rows[0].data;
       if (d && Object.keys(d).length) { apply(d); try { localStorage.setItem('cms_pub', JSON.stringify(d)); } catch (e) {} }
@@ -203,6 +233,31 @@
     var v = state.s[sel] = state.s[sel] || {};
     v[key] = val; styleEl(texts[sel], v); dirty();
   }
+    /* ---------- bấm vào ảnh trên trang để đổi ---------- */
+  function effOpacity(el) {   // độ mờ thực tế (nhân cả các thẻ cha)
+    var o = 1;
+    while (el && el !== document.documentElement) {
+      var cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return 0;
+      o *= parseFloat(cs.opacity);
+      el = el.parentElement;
+    }
+    return o;
+  }
+  function imgBox(im) {   // ảnh giả/chưa có (bị ẩn) thì lấy khung của thẻ cha
+    var el = getComputedStyle(im).display === 'none' ? im.parentElement : im;
+    return { el: el, r: el.getBoundingClientRect() };
+  }
+  function imgAt(x, y) {
+    var best = null, bo = 0.15;
+    imgKeys.forEach(function (k) {
+      var b = imgBox(imgs[k]), r = b.r;
+      if (r.width < 20 || r.height < 20 || x < r.left || x > r.right || y < r.top || y > r.bottom) return;
+      var o = effOpacity(b.el);
+      if (o >= bo) { best = k; bo = o; }   // ảnh nào đang hiện rõ nhất, ảnh phía trước thắng
+    });
+    return best;
+  }
   function buildUI() {
     var o = $('opening'); if (o) o.classList.add('open');
     var b = document.createElement('div'); b.id = 'cmsBar';
@@ -215,8 +270,64 @@
     b.innerHTML = '<h4>Lưu</h4><button id="cmsSave">Lưu nháp</button><button id="cmsPub" class="p">Xuất bản</button><button id="cmsDis">Hủy nháp</button><button id="cmsOut">Thoát</button><button id="cmsDoor">Đóng/mở cửa</button><div id="cmsMsg"></div>' +
       '<h4>Chữ đang chọn</h4><div id="cmsLbl">(bấm vào một đoạn chữ trên trang)</div>' +
       'Cỡ chữ (rem) <input id="cmsFs" type="number" step="0.05" min="0.5" max="12" style="width:70px"><br>Phông <select id="cmsFf">' + fonts + '</select><br>Màu <input id="cmsC" type="color"> <button id="cmsRs">Đặt lại kiểu</button>' +
-      '<h4>Ảnh &amp; video</h4>' + rows + '<input id="cmsFile" type="file" accept="image/*" hidden>';
+      '<h4>Ảnh &amp; video</h4><button id="cmsPick" class="p">📷 Bấm vào ảnh để đổi</button> <button id="cmsIns" class="p">🖼️ Chèn ảnh vào thẻ chữ</button>' +
+    '<details><summary>Danh sách / YouTube / chú thích</summary>' + rows + '</details>' +
+    '<input id="cmsFile" type="file" accept="image/*" hidden>';
     document.body.appendChild(b);
+        if (window.CMSX_ui) window.CMSX_ui(b);
+        var hlEl = document.createElement('div'); hlEl.id = 'cmsHL'; hlEl.style.display = 'none'; document.body.appendChild(hlEl);
+    function hl(k) {
+      if (!k) { hlEl.style.display = 'none'; return; }
+      var r = imgBox(imgs[k]).r;
+      hlEl.style.cssText = 'display:block;left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px';
+    }
+    function pickMode(on) {
+        if (on) insMode(false); 
+      document.body.classList.toggle('cmsImg', on);
+      $('cmsPick').textContent = on ? '✖ Hủy (Esc)' : '📷 Bấm vào ảnh để đổi';
+      if (on) msg('Rê chuột vào ảnh rồi bấm để đổi'); else { hl(null); msg(''); }
+    }
+        function insMode(on) {
+      document.body.classList.toggle('cmsIns', on);
+      $('cmsIns').textContent = on ? '✖ Hủy (Esc)' : '🖼️ Chèn ảnh vào thẻ chữ';
+      if (on) { pickMode(false); msg('Bấm vào một thẻ chữ: ảnh sẽ chèn vào cuối thẻ đó'); } else { hl(null); }
+    }
+    var insOn = function () { return document.body.classList.contains('cmsIns'); };
+    $('cmsIns').onclick = function () { insMode(!insOn()); };
+    document.addEventListener('mousemove', function (e) {
+      if (!insOn() || inUI(e)) return;
+      var c = e.target.closest && e.target.closest('.card');
+      if (!c) { hl(null); return; }
+      var r = c.getBoundingClientRect();
+      hlEl.style.cssText = 'display:block;left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px';
+    });
+    ['mousedown', 'click'].forEach(function (t) {
+      document.addEventListener(t, function (e) {
+        if (!insOn() || inUI(e)) return;
+        e.preventDefault(); e.stopPropagation();
+        if (t !== 'click') return;
+        var c = e.target.closest && e.target.closest('.card'), k = c && keyOf(c);
+        if (!k || cards[k] !== c) { msg('Bấm vào thẻ chữ (khung nền tối có chữ)'); return; }
+        insertTo = k; insMode(false);
+        $('cmsFile').value = ''; $('cmsFile').click();
+      }, true);
+    });
+    var inUI = function (e) { return e.target.closest && e.target.closest('#cmsBar,#cmsLogin'); };
+    var imgMode = function () { return document.body.classList.contains('cmsImg'); };
+    $('cmsPick').onclick = function () { pickMode(!imgMode()); };
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { pickMode(false); insMode(false); } });
+    document.addEventListener('mousemove', function (e) { if (imgMode() && !inUI(e)) hl(imgAt(e.clientX, e.clientY)); });
+    ['mousedown', 'click'].forEach(function (t) {
+      document.addEventListener(t, function (e) {
+        if (!imgMode() || inUI(e)) return;
+        e.preventDefault(); e.stopPropagation();
+        if (t !== 'click') return;
+        var k = imgAt(e.clientX, e.clientY);
+        if (!k) { msg('Chỗ này không có ảnh · thử bấm chỗ khác'); return; }
+        pending = k; pickMode(false);
+        $('cmsFile').value = ''; $('cmsFile').click();
+      }, true);
+    });
     $('cmsFs').oninput = function () { setStyle('fs', this.value ? this.value + 'rem' : ''); };
     $('cmsFf').onchange = function () { setStyle('ff', this.value); };
     $('cmsC').oninput = function () { setStyle('c', this.value); };
@@ -259,7 +370,9 @@
         return sb.storage.from('media').upload(path, blob, { contentType: 'image/webp' }).then(function (r) {
           if (r.error) throw r.error;
           var url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
-          state.i[pending] = url; setImg(pending, url); dirty();
+          if (insertTo) { (state.n = state.n || []).push({ k: insertTo, u: url, c: '' }); insertTo = null; renderIns(state.n); }
+else { state.i[pending] = url; setImg(pending, url); }
+dirty();
         });
       }).catch(function (e) { msg('Lỗi tải ảnh: ' + (e.message || e)); });
     };
@@ -279,6 +392,6 @@
     });
     document.addEventListener('click', function (e) { var a = e.target.closest('a'); if (a && !a.closest('#cmsBar')) e.preventDefault(); }, true);
   }
-
+    if (window.CMSX_init) window.CMSX_init({ EDIT: EDIT, state: function () { return state; }, sb: function () { return sb; }, dirty: dirty, msg: msg, okUrl: okUrl, ytId: ytId, keyOf: keyOf, shrink: shrink });
   if (EDIT) startEdit(); else loadPublished();
 })();
