@@ -183,7 +183,7 @@
     d.innerHTML = '<form><b>Đăng nhập để chỉnh sửa</b><button type="button">Đăng nhập bằng Google</button><small></small></form>';
     d.querySelector('button').onclick = function () {
       try { localStorage.setItem('cms_edit', '1'); } catch (e) {}
-      sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } }).then(function (r) {
+      sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname + '?edit=1' } }).then(function (r) {
         if (r.error) d.querySelector('small').textContent = 'Không đăng nhập được: ' + r.error.message;
       });
     };

@@ -27,9 +27,15 @@
   setTimeout(() => mo.disconnect(), 10000);
 
   // Chỉ hiện khi mở local (file://, localhost) hoặc thêm ?edit vào địa chỉ. Người xem web thật không thấy.
-  const dev = /[?&]edit\b/.test(location.search) || location.protocol === 'file:' ||
-              ['localhost', '127.0.0.1'].includes(location.hostname);
-  if (!dev) return;
+  
+const dev =
+  /[?&]edit(?:=1|&|$)/.test(location.search) ||
+  location.protocol === 'file:' ||
+  ['localhost', '127.0.0.1'].includes(location.hostname) ||
+  localStorage.getItem('cms_edit') === '1';
+
+if (!dev) return;
+
 
   const FONTS = [
     ['Font gốc', ''],
