@@ -2239,3 +2239,214 @@ figcaption:empty {
     }
 }
 
+/* ==========================================
+   TRUE FULLSCREEN - CHAPTER II
+   Bữa ăn / Bài tập / Kỹ năng
+   ========================================== */
+
+/* Phân cảnh rộng bằng toàn bộ website */
+
+#actsWrap {
+    display: block !important;
+
+    position: relative !important;
+
+    width: 100vw !important;
+    max-width: none !important;
+
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+/* Khung cố định khi cuộn */
+
+#actsWrap .acts-stick {
+    position: sticky !important;
+    top: 0 !important;
+
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    overflow: hidden !important;
+}
+
+/* Mỗi cảnh chiếm toàn bộ viewport */
+
+#actsWrap .act {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    overflow: hidden !important;
+    isolation: isolate;
+}
+
+/* ẢNH NỀN FULL SCREEN */
+
+#actsWrap .act > .act-background {
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+
+    min-width: 100vw !important;
+    max-width: none !important;
+
+    min-height: 0 !important;
+    max-height: none !important;
+
+    aspect-ratio: auto !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    transform: none !important;
+    translate: none !important;
+    scale: none !important;
+
+    clip-path: none !important;
+
+    opacity: 1 !important;
+    filter: none !important;
+
+    z-index: 0 !important;
+}
+
+/* Gradient tối để đọc chữ */
+
+#actsWrap .act::after {
+    content: "" !important;
+
+    position: absolute !important;
+    inset: 0 !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,.72) 0%,
+            rgba(0,0,0,.38) 35%,
+            transparent 75%
+        ),
+        linear-gradient(
+            to top,
+            rgba(0,0,0,.65),
+            transparent 55%
+        ) !important;
+
+    z-index: 1 !important;
+    pointer-events: none;
+}
+
+/* CHỮ NẰM TRỰC TIẾP TRÊN ẢNH */
+
+#actsWrap .act .act-text {
+    position: absolute !important;
+
+    left: 6vw !important;
+    bottom: 12vh !important;
+
+    top: auto !important;
+    right: auto !important;
+
+    width: min(580px, 85vw) !important;
+    max-width: 85vw !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: transparent !important;
+
+    z-index: 20 !important;
+}
+
+/* Tiêu đề */
+
+#actsWrap .act-text h3 {
+    color: #fff5e8 !important;
+
+    font-size: clamp(55px, 8vw, 130px) !important;
+    font-weight: 400 !important;
+
+    text-shadow:
+        0 4px 25px rgba(0,0,0,.65) !important;
+}
+
+/* Nội dung */
+
+#actsWrap .act-text p {
+    color: #ffffff !important;
+
+    font-size: clamp(16px, 1.4vw, 22px) !important;
+    line-height: 1.8 !important;
+
+    white-space: normal !important;
+
+    text-shadow:
+        0 2px 12px rgba(0,0,0,.9) !important;
+}
+
+/* Số thứ tự */
+
+#actsWrap .act-text .tag {
+    color: #f4c68c !important;
+}
+
+/* Chấm chuyển cảnh */
+
+#actsWrap .act-dots {
+    z-index: 100 !important;
+}
+
+/* Điện thoại */
+
+@media (max-width: 768px) {
+    #actsWrap .act .act-text {
+        left: 6vw !important;
+        bottom: 12vh !important;
+        width: 88vw !important;
+    }
+
+    #actsWrap .act-text h3 {
+        font-size: clamp(45px, 12vw, 75px) !important;
+    }
+}
+
