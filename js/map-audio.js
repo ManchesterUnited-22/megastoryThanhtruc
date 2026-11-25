@@ -2,7 +2,10 @@
 (() => {
     "use strict";
 
-    // Cấu hình âm thanh cho từng phân cảnh
+    // ==========================================
+    // CẤU HÌNH ÂM THANH
+    // ==========================================
+
     const SCENES = [
         {
             id: "timeline",
@@ -30,16 +33,30 @@
     let activeScene = null;
     let source = null;
     let gain = null;
+    let startedAt = 0;
     let scheduled = false;
 
-    // Khởi tạo từng phân cảnh
+    // ==========================================
+    // LƯU TRẠNG THÁI RIÊNG CHO TỪNG BÀI NHẠC
+    // ==========================================
+
     const scenes = SCENES.map(config => ({
         ...config,
         element: document.getElementById(config.id),
-        buffer: null
+        buffer: null,
+
+        // Vị trí đã phát
+        offset: 0,
+
+        // Trạng thái đã phát hết bài
+        finished: false
+
     })).filter(scene => scene.element);
 
-    // Tải trước toàn bộ âm thanh
+    // ==========================================
+    // TẢI FILE MP3
+    // ==========================================
+
     scenes.forEach(async scene => {
         try {
             const response = await fetch(scene.path);
@@ -66,7 +83,10 @@
         }
     });
 
-    // Mở quyền âm thanh bằng Space hoặc chuột
+    // ==========================================
+    // MỞ QUYỀN PHÁT ÂM THANH
+    // ==========================================
+
     async function unlockAudio() {
         try {
             await context.resume();
@@ -88,76 +108,167 @@
         }
     }, true);
 
-    // Dừng âm thanh hiện tại
-    function stopMusic() {
-        if (source) {
-            try {
-                source.stop();
-            } catch (_) {}
+    // ==========================================
+    // TẠM DỪNG VÀ LƯU VỊ TRÍ ĐANG PHÁT
+    // ==========================================
 
-            source.disconnect();
-            source = null;
+    function pauseMusic() {
+        if (!source || !activeScene) return;
+
+        const elapsed =
+            context.currentTime - startedAt;
+
+        activeScene.offset = Math.min(
+            activeScene.offset + elapsed,
+            activeScene.buffer.duration
+        );
+
+        if (
+            activeScene.offset >=
+            activeScene.buffer.duration
+        ) {
+            activeScene.finished = true;
         }
+
+        console.log(
+            "[SceneAudio] Pause:",
+            activeScene.id,
+            activeScene.offset.toFixed(2) + "s"
+        );
+
+        source.onended = null;
+
+        try {
+            source.stop();
+        } catch (_) {}
+
+        source.disconnect();
 
         if (gain) {
             gain.disconnect();
-            gain = null;
         }
 
+        source = null;
+        gain = null;
         activeScene = null;
     }
 
-    // Phát âm thanh của phân cảnh
+    // ==========================================
+    // PHÁT HOẶC TIẾP TỤC BÀI NHẠC
+    // ==========================================
+
     function startMusic(scene) {
+
         if (!scene.buffer) return;
+        if (scene.finished) return;
         if (context.state !== "running") return;
 
-        // Không phát lại liên tục khi đang cuộn
         if (activeScene === scene && source) return;
 
-        // Dừng nhạc cũ trước khi phát nhạc mới
-        stopMusic();
+        pauseMusic();
+
+        if (scene.offset >= scene.buffer.duration) {
+            scene.finished = true;
+            return;
+        }
 
         source = context.createBufferSource();
         gain = context.createGain();
 
         source.buffer = scene.buffer;
-        source.loop = true;
+
+        // KHÔNG LẶP LẠI BÀI NHẠC
+        source.loop = false;
 
         source.connect(gain);
         gain.connect(context.destination);
 
         const now = context.currentTime;
 
+        // Tính âm lượng dựa trên thời gian đã phát
+        const progress = Math.min(
+            scene.offset / scene.fadeDuration,
+            1
+        );
+
+        const currentVolume =
+            scene.startVolume +
+            (
+                scene.backgroundVolume -
+                scene.startVolume
+            ) * progress;
+
         gain.gain.setValueAtTime(
-            scene.startVolume,
+            currentVolume,
             now
         );
 
-        gain.gain.linearRampToValueAtTime(
-            scene.backgroundVolume,
-            now + scene.fadeDuration
+        // Tiếp tục giảm âm lượng nếu chưa đủ 5 giây
+        const remainingFade = Math.max(
+            scene.fadeDuration - scene.offset,
+            0
         );
 
-        source.start(0, 0);
+        if (remainingFade > 0) {
+            gain.gain.linearRampToValueAtTime(
+                scene.backgroundVolume,
+                now + remainingFade
+            );
+        }
 
         activeScene = scene;
+        startedAt = now;
+
+        const currentSource = source;
+
+        // Khi phát hết bài thì dừng hẳn
+        source.onended = () => {
+
+            if (source !== currentSource) return;
+
+            scene.finished = true;
+            scene.offset = scene.buffer.duration;
+
+            currentSource.disconnect();
+
+            if (gain) {
+                gain.disconnect();
+            }
+
+            source = null;
+            gain = null;
+            activeScene = null;
+
+            console.log(
+                "[SceneAudio] Đã phát hết:", scene.id
+            );
+        };
+
+        // Phát tiếp tại vị trí đã lưu
+        source.start(0, scene.offset);
 
         console.log(
-            "[SceneAudio] Đang phát:", scene.id
+            "[SceneAudio] Play:",
+            scene.id,
+            scene.offset.toFixed(2) + "s"
         );
     }
 
-    // Xác định phân cảnh hiện tại
+    // ==========================================
+    // KIỂM TRA PHÂN CẢNH HIỆN TẠI
+    // ==========================================
+
     function checkPosition() {
+
         if (document.hidden) {
-            stopMusic();
+            pauseMusic();
             return;
         }
 
         const triggerPoint = window.innerHeight * 0.5;
 
         const currentScene = scenes.find(scene => {
+
             const rect =
                 scene.element.getBoundingClientRect();
 
@@ -168,19 +279,23 @@
         });
 
         if (!currentScene) {
-            stopMusic();
+            pauseMusic();
             return;
         }
 
         if (activeScene !== currentScene) {
-            stopMusic();
+            pauseMusic();
         }
 
         startMusic(currentScene);
     }
 
-    // Theo dõi thao tác cuộn
+    // ==========================================
+    // THEO DÕI SCROLL
+    // ==========================================
+
     function handleScroll() {
+
         if (scheduled) return;
 
         scheduled = true;
@@ -202,7 +317,7 @@
         checkPosition
     );
 
-    window.addEventListener("pagehide", stopMusic);
+    window.addEventListener("pagehide", pauseMusic);
 
     window.addEventListener("pageshow", checkPosition);
 
