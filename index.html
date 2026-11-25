@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=no-placeholder-6">
+<link rel="stylesheet" href="css/style.css?v=smooth-v7">
 </head>
 <body data-tone="blood">
 
@@ -284,7 +284,7 @@
       <div class="acts-stick">
 
         <div class="act on">
-          <img src="assets/images/meal.jpg" alt="" onerror="this.style.display='none'">
+          <img class="act-background"src="assets/images/meal.jpg" alt="" onerror="this.style.display='none'">
           <div class="act-text">
             <span class="tag">01 / 03</span>
             <h3>Bữa ăn</h3>
@@ -293,7 +293,7 @@
         </div>
 
         <div class="act">
-          <img src="assets/images/exercise.jpg" alt="" onerror="this.style.display='none'">
+          <img class="act-background" src="assets/images/exercise.jpg" alt="" onerror="this.style.display='none'">
           <div class="act-text">
             <span class="tag">02 / 03</span>
             <h3>Bài tập</h3>
@@ -302,7 +302,7 @@
         </div>
 
         <div class="act">
-          <img src="assets/images/skill.jpg" alt="" onerror="this.style.display='none'">
+          <img class="act-background" src="assets/images/skill.jpg" alt="" onerror="this.style.display='none'">
           <div class="act-text">
             <span class="tag">03 / 03</span>
             <h3>Kỹ năng</h3>
@@ -486,10 +486,10 @@
   }
 
   try {
-    await load('js/main.js?v=layout-fix-4');
+    await load('js/main.js?v=smooth-v7');
   } finally {
     cms?.finish();
-    await load('js/editor.js?v=no-placeholder-6');
+    await load('js/editor.js?v=smooth-v7');
   }
 })().catch(console.error);
 </script>

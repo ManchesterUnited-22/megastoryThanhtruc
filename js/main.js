@@ -5,10 +5,27 @@
   // tiến độ cuộn (0..1) của khối cao có phần tử sticky bên trong
   function progressOf(el) {
     if (!el) return 0;
-    var r = el.getBoundingClientRect();
-    var total = r.height - window.innerHeight;
-    return total > 0 ? clamp(-r.top / total, 0, 1) : 0;
-  }
+
+    var rect = el.getBoundingClientRect();
+
+    var sticky = el.querySelector(
+        '.acts-stick,.fog-stick,.puzzle-stick'
+    );
+
+    var height = sticky
+        ? sticky.getBoundingClientRect().height
+        : window.innerHeight;
+
+    var distance = rect.height - height;
+
+    if (distance <= 0) return 0;
+
+    return clamp(
+        -rect.top / distance,
+        0,
+        1
+    );
+}
   function isPinned(el) {
     var r = el.getBoundingClientRect();
     return r.top <= 0 && r.bottom >= window.innerHeight;
@@ -153,28 +170,64 @@
   var dots = Array.prototype.slice.call(document.querySelectorAll('.act-dots i'));
   function updateActs() {
     if (!actsWrap || !acts.length) return;
-    var p = progressOf(actsWrap), n = acts.length, B = 0.025, idx = 0, best = -1;
-    acts.forEach(function (a, i) {
-      // ảnh: giao nhau mờ quanh ranh giới
-      var inn = i === 0 ? 1 : clamp((p - (i / n - B)) / (2 * B), 0, 1);
-      var out = i === n - 1 ? 1 : 1 - clamp((p - ((i + 1) / n - B)) / (2 * B), 0, 1);
-      var o = inn * out;
-      a.classList.remove('on');
-      a.style.opacity = o.toFixed(3);
-      a.style.visibility = o < 0.01 ? 'hidden' : 'visible';
-      var img = a.querySelector('img');
-      if (img) img.style.transform = 'scale(' + (1 + 0.03 * clamp((p - i / n) * n, 0, 1)).toFixed(4) + ')';
-      // chữ: tách riêng, tắt hẳn trước khi chữ kế tiếp hiện
-      var t = a.querySelector('.act-text');
-      if (t) {
-        t.style.opacity = '1';
-        t.style.transform = 'none';
-        t.style.filter = 'none';
-      }
-      if (o > best) { best = o; idx = i; }
+
+    var p = progressOf(actsWrap);
+    var n = acts.length;
+
+    var active = Math.min(
+        n - 1,
+        Math.floor(p * n)
+    );
+
+    acts.forEach(function (act, i) {
+        var local = clamp(p * n - i, 0, 1);
+
+        var fadeIn = i === 0
+            ? 1
+            : smooth(local / 0.10);
+
+        var fadeOut = i === n - 1
+            ? 1
+            : 1 - smooth((local - 0.90) / 0.10);
+
+        var opacity = i === active
+            ? fadeIn * fadeOut
+            : 0;
+
+        act.classList.toggle('on', i === active);
+
+        act.style.opacity = opacity.toFixed(4);
+
+        act.style.visibility =
+            opacity > 0.001 ? 'visible' : 'hidden';
+
+        act.style.pointerEvents =
+            i === active ? 'auto' : 'none';
+
+        // Chỉ tác động lên ảnh nền gốc.
+        var img = act.querySelector('.act-background');
+
+        if (img) {
+            var scale = 1 + 0.015 * smooth(local);
+
+            img.style.transform =
+                'scale(' + scale.toFixed(4) + ')';
+        }
+
+        // Chữ kế thừa opacity của phân cảnh.
+        var text = act.querySelector('.act-text');
+
+        if (text) {
+            text.style.opacity = '1';
+            text.style.transform = 'none';
+            text.style.filter = 'none';
+        }
     });
-    dots.forEach(function (d, i) { d.classList.toggle('on', i === idx); });
-  }
+
+    dots.forEach(function (dot, i) {
+        dot.classList.toggle('on', i === active);
+    });
+}
 
   /* ---------- CHƯƠNG III: nền mờ dần, từng đoạn ẩn hẳn rồi mới đến đoạn sau ---------- */
   var fogWrap = $('fogWrap'), narrow = $('narrow');

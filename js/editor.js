@@ -800,29 +800,64 @@ function replaceMedia(item, target = selected) {
   }
 
   function putInArea(el, area) {
-    Object.assign(el.style, {
-      position: 'absolute',
-      margin: '0',
-      zIndex: '1000',
-      left: (area.x + scrollX) + 'px',
-      top: (area.y + scrollY) + 'px',
-      width: area.width + 'px'
-    });
-    // Anchor to the visible scene rather than a document-wide scroll coordinate.
-    const host = area.host && area.host.isConnected ? area.host : document.querySelector('main');
+    const host =
+        area.host && area.host.isConnected
+            ? area.host
+            : document.querySelector('main');
+
     if (!host) return;
+
     const bounds = host.getBoundingClientRect();
-    el.style.left = (area.x - bounds.left) + 'px';
-    el.style.top = (area.y - bounds.top) + 'px';
+
+    if (!bounds.width || !bounds.height) return;
+
+    if (getComputedStyle(host).position === 'static') {
+        host.style.position = 'relative';
+    }
+
+    const x = area.x - bounds.left;
+    const y = area.y - bounds.top;
+
+    Object.assign(el.style, {
+        position: 'absolute',
+
+        left: (x / bounds.width * 100) + '%',
+
+        top: (y / bounds.height * 100) + '%',
+
+        width: (area.width / bounds.width * 100) + '%',
+
+        margin: '0',
+
+        zIndex: '1000',
+
+        right: 'auto',
+
+        bottom: 'auto'
+    });
+
+    if (el.matches('img,video,iframe')) {
+        el.style.height =
+            (area.height / bounds.height * 100) + '%';
+
+        el.style.objectFit = 'cover';
+        el.style.display = 'block';
+    }
+
     host.append(el);
+
     cms?.insert(el);
-    const rect = el.getBoundingClientRect();
-    el.style.left = (parseFloat(el.style.left) + area.x - rect.left) + 'px';
-    el.style.top = (parseFloat(el.style.top) + area.y - rect.top) + 'px';
-    undo.push({ run: () => el.remove() });
+
+    undo.push({
+        run: () => el.remove()
+    });
+
     dirty = true;
+
+    cms?.touch();
+
     select(el);
-  }
+}
 
   function drawArea() {
     stopEdit();
