@@ -656,3 +656,635 @@ img[style*="display: none"] {
         max-width: calc(100% - 2.4rem);
     }
 }
+/* ==================================================
+   DOCUMENTARY VIDEO SECTION
+   ================================================== */
+
+#documentarySection {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: auto;
+    min-height: 0;
+
+    padding: clamp(70px, 12vh, 150px)
+             clamp(16px, 5vw, 80px);
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    background: linear-gradient(
+        180deg,
+        rgba(34, 25, 20, 0),
+        rgba(34, 25, 20, 0.96) 15%,
+        rgba(34, 25, 20, 0.96) 85%,
+        rgba(34, 25, 20, 0)
+    );
+}
+
+
+/* Container */
+
+.documentary-inner {
+    position: relative;
+
+    width: 100%;
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    z-index: 2;
+
+    box-sizing: border-box;
+}
+
+
+/* Tiêu đề */
+
+.documentary-header {
+    max-width: 760px;
+
+    margin: 0 auto 36px;
+
+    text-align: center;
+}
+
+.documentary-line {
+    display: block;
+
+    width: 48px;
+    height: 1px;
+
+    margin: 0 auto 20px;
+
+    background: #b99a72;
+}
+
+.documentary-eyebrow {
+    display: block;
+
+    margin-bottom: 16px;
+
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+
+    color: #c9a77f;
+}
+
+.documentary-header h2 {
+    margin: 0 0 18px;
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: clamp(28px, 4vw, 48px);
+
+    font-weight: 400;
+    line-height: 1.25;
+
+    color: #f3e7d5;
+}
+
+.documentary-header p {
+    max-width: 620px;
+
+    margin: 0 auto;
+
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    font-size: clamp(13px, 1.2vw, 16px);
+    line-height: 1.9;
+
+    color: #cbbbae;
+}
+
+
+/* Khung video */
+
+#documentaryFrame {
+    position: relative !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    margin: 0 auto !important;
+
+    padding: clamp(8px, 1.4vw, 16px);
+
+    box-sizing: border-box;
+
+    background: #30251f;
+
+    border: 1px solid rgba(185, 154, 114, 0.65);
+
+    border-radius: 5px;
+
+    box-shadow:
+        0 0 0 5px rgba(185, 154, 114, 0.06),
+        0 24px 80px rgba(0, 0, 0, 0.35);
+
+    transform: none !important;
+
+    overflow: hidden;
+}
+
+
+/* Màn hình video tỷ lệ 16:9 */
+
+.documentary-screen {
+    position: relative !important;
+
+    width: 100% !important;
+
+    aspect-ratio: 16 / 9;
+
+    height: auto !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: #151210;
+
+    border-radius: 2px;
+
+    overflow: hidden !important;
+
+    isolation: isolate;
+}
+
+
+/* Video luôn nằm bên trong màn hình */
+
+.documentary-screen > iframe,
+.documentary-screen > video,
+.documentary-screen > img {
+
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border: 0 !important;
+
+    transform: none !important;
+    translate: none !important;
+
+    opacity: 1 !important;
+
+    object-fit: contain;
+
+    display: block;
+
+    z-index: 2;
+
+    transition: none !important;
+    animation: none !important;
+}
+
+
+/* Giao diện khi chưa có video */
+
+.documentary-empty {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    background: radial-gradient(
+        ellipse at center,
+        #302720,
+        #151210 75%
+    );
+
+    color: #c9a77f;
+
+    font-size: 12px;
+    letter-spacing: 0.12em;
+
+    pointer-events: none;
+
+    z-index: 3;
+}
+
+.documentary-play {
+    display: grid;
+
+    place-items: center;
+
+    width: 66px;
+    height: 66px;
+
+    border-radius: 50%;
+
+    border: 1px solid #b99a72;
+
+    background: rgba(185, 154, 114, 0.08);
+
+    color: #e4cfb2;
+
+    font-size: 23px;
+}
+
+
+/* Tự ẩn màn hình chờ khi đã chèn video */
+
+.documentary-screen:has(
+    iframe[src*="youtube.com/embed/"]
+) .documentary-empty,
+
+.documentary-screen:has(
+    iframe[src*="youtube-nocookie.com/embed/"]
+) .documentary-empty,
+
+.documentary-screen:has(
+    video[src]:not([src=""])
+) .documentary-empty,
+
+.documentary-screen:has(
+    img[src]:not([src=""])
+) .documentary-empty {
+    display: none !important;
+}
+
+
+/* Chú thích bên dưới video */
+
+.documentary-caption {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 16px;
+
+    padding: 22px 10px 8px;
+
+    margin: 0;
+
+    text-align: center;
+
+    font-family: 'Newsreader', serif;
+
+    font-size: clamp(13px, 1.6vw, 18px);
+    font-style: italic;
+
+    line-height: 1.5;
+
+    color: #d0b89a;
+}
+
+.documentary-caption-line {
+    width: 32px;
+    height: 1px;
+
+    flex-shrink: 0;
+
+    background: rgba(185, 154, 114, 0.45);
+}
+
+
+/* Không sử dụng placeholder cũ */
+
+#documentaryFrame::before,
+#documentaryFrame::after,
+.documentary-screen::before,
+.documentary-screen::after {
+    content: none !important;
+
+    display: none !important;
+}
+
+
+/* Responsive */
+
+@media (max-width: 720px) {
+
+    #documentarySection {
+        padding: 65px 16px;
+    }
+
+    .documentary-header {
+        margin-bottom: 24px;
+    }
+
+    .documentary-header h2 {
+        font-size: 28px;
+    }
+
+    .documentary-header p {
+        font-size: 13px;
+    }
+
+    #documentaryFrame {
+        padding: 7px;
+    }
+
+    .documentary-play {
+        width: 46px;
+        height: 46px;
+
+        font-size: 17px;
+    }
+
+    .documentary-caption {
+        gap: 8px;
+
+        padding: 15px 4px 5px;
+    }
+
+    .documentary-caption-line {
+        width: 14px;
+    }
+}
+/* ==========================================
+   FIX CONTENT OVERFLOW
+   ========================================== */
+
+.step > .card {
+    box-sizing: border-box;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+
+    align-self: center;
+
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.card p,
+.card h1,
+.card h2,
+.card h3,
+.card h4,
+.card blockquote {
+    height: auto !important;
+    max-height: none !important;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+
+    box-sizing: border-box;
+}
+
+.card p {
+    line-height: 1.75;
+}
+
+.card img,
+.card video,
+.card iframe {
+    max-width: 100%;
+}
+
+.step {
+    box-sizing: border-box;
+}
+
+@media (max-width: 720px) {
+    .step > .card {
+        max-width: 100% !important;
+
+        height: auto !important;
+
+        padding: 1.4rem;
+    }
+}
+/* ==========================================
+   MANUAL OPENING
+   ========================================== */
+
+body.opening-locked {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+}
+
+html:has(body.opening-locked) {
+    overflow: hidden !important;
+    scroll-behavior: auto !important;
+}
+
+body.opening-locked #rail {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#opening {
+    position: relative;
+    isolation: isolate;
+}
+
+/* Hai cánh cửa đóng mặc định */
+
+#opening:not(.open) .op-door {
+    transform: none !important;
+}
+
+/* Tốc độ mở cửa */
+
+#opening .op-door {
+    transition:
+        transform 1.8s
+        cubic-bezier(.76, 0, .24, 1)
+        .1s;
+
+    will-change: transform;
+}
+
+/* Nút mở cửa */
+
+.opening-trigger {
+    position: absolute;
+
+    left: 50%;
+    bottom: 9%;
+
+    transform: translateX(-50%);
+
+    z-index: 20;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 14px;
+
+    padding: 15px;
+
+    border: 0;
+    background: transparent;
+
+    color: #dfc4a4;
+
+    cursor: pointer;
+
+    transition:
+        opacity .35s ease,
+        visibility .35s ease;
+}
+
+.opening-key {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 100px;
+
+    padding: 12px 24px;
+
+    border: 1px solid
+        rgba(207, 174, 133, .65);
+
+    border-radius: 5px;
+
+    background:
+        rgba(207, 174, 133, .06);
+
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    letter-spacing: .22em;
+
+    color: #f1deca;
+
+    transition:
+        background .25s ease,
+        box-shadow .25s ease,
+        transform .25s ease;
+}
+
+.opening-trigger:hover .opening-key {
+    background:
+        rgba(207, 174, 133, .16);
+
+    box-shadow:
+        0 0 24px rgba(207, 174, 133, .15);
+
+    transform: translateY(-3px);
+}
+
+.opening-trigger:focus-visible {
+    outline: 1px solid #dfc4a4;
+    outline-offset: 5px;
+}
+
+.opening-hint,
+.opening-mobile-hint {
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    font-size: 11px;
+
+    font-weight: 400;
+
+    letter-spacing: .12em;
+
+    color: #bfa78b;
+
+    white-space: nowrap;
+}
+
+.opening-mobile-hint {
+    display: none;
+}
+
+/* Ẩn nút sau khi mở cửa */
+
+#opening.open .opening-trigger {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Đồng bộ nội dung sau khi cửa mở */
+
+#opening .op-item {
+    transition:
+        opacity .9s ease,
+        transform .9s ease;
+}
+
+#opening.open .op-lead {
+    transition-delay: 1.15s;
+}
+
+#opening.open .op-cap {
+    transition-delay: 1.3s;
+}
+
+#opening.open .cue {
+    transition-delay: 1.5s;
+}
+
+/* MOBILE */
+
+@media (max-width: 720px) {
+
+    .opening-trigger {
+        bottom: 6%;
+    }
+
+    .opening-hint {
+        display: none;
+    }
+
+    .opening-mobile-hint {
+        display: block;
+    }
+
+    .opening-key {
+        font-size: 0;
+        min-width: 75px;
+    }
+
+    .opening-key::after {
+        content: 'MỞ';
+        font-size: 12px;
+    }
+}
+
+/* Hỗ trợ người dùng hạn chế chuyển động */
+
+@media (prefers-reduced-motion: reduce) {
+
+    #opening .op-door,
+    #opening .op-item,
+    #opening .opening-trigger {
+        transition: none !important;
+    }
+}

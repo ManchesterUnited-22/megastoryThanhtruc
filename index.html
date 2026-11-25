@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=smooth-v7">
+<link rel="stylesheet" href="css/style.css?v=opening-v11">
 </head>
 <body data-tone="blood">
 
@@ -98,7 +98,8 @@
       <!-- HAI CÁNH CỬA: tiêu đề nằm trên cửa, mở ra thì chữ tách đôi -->
       <div class="op-door l">
         <div class="dt">
-          <div class="eyebrow">Megastory <i></i> Mở đầu</div>
+          <div class="eyebrow">Megastory</div>
+          <div class="op-door r" aria-hidden="true"></div>
           <h1 class="dt-h1"><span>Những mảnh đời</span><span>sau cánh cửa</span></h1>
           <p class="dt-sub">trung tâm chăm sóc trẻ em chất độc da cam</p>
         </div>
@@ -110,6 +111,28 @@
           <p class="dt-sub">trung tâm chăm sóc trẻ em chất độc da cam</p>
         </div>
       </div>
+
+<!-- NÚT MỞ CÁNH CỬA -->
+
+<button
+    type="button"
+    class="opening-trigger"
+    id="openingTrigger"
+    aria-label="Mở cánh cửa">
+
+    <span class="opening-key">
+        SPACE
+    </span>
+
+    <span class="opening-hint">
+        Nhấn để mở cánh cửa
+    </span>
+
+    <span class="opening-mobile-hint">
+        Chạm để mở cánh cửa
+    </span>
+
+</button>
 
     </div>
 
@@ -404,26 +427,84 @@
       </div>
     </div>
 
-    <!-- ĐIỂM NHẤN: 3 mảnh bay từ 3 phía vào ghép thành một khung ảnh -->
-    <div class="step puzzle-wrap" id="puzzleWrap" data-scene="8" data-mood="dim">
-      <div class="puzzle-stick">
-        <div class="frame4" id="frame4">
-          <div class="piece p1" data-x="-110" data-y="0" data-r="-8">
-            <img src="assets/images/c4.jpg" alt="" onerror="this.style.display='none'">
-            <div class="lab"><span class="tag">Trước mắt</span><p>Thăm hỏi, trao quà, hỗ trợ vật chất</p></div>
-          </div>
-          <div class="piece p2" data-x="70" data-y="-110" data-r="9">
-            <img src="assets/images/c4.jpg" alt="" onerror="this.style.display='none'">
-            <div class="lab"><span class="tag">Lâu dài</span><p>Đồng hành và chính sách thiết thực</p></div>
-          </div>
-          <div class="piece p3" data-x="40" data-y="110" data-r="-7">
-            <img src="assets/images/c4.jpg" alt="" onerror="this.style.display='none'">
-            <div class="lab"><span class="tag">Thế hệ trẻ</span><p>Nhận thức và hành động cụ thể</p></div>
-          </div>
-        </div>
-        <p class="frame-cap" id="frameCap">Ba mảnh ghép. Một bức tranh trọn vẹn.</p>
-      </div>
+    <!-- ============ VIDEO TƯ LIỆU ============ -->
+
+<div class="step documentary-section"
+     id="documentarySection"
+     data-scene="8"
+     data-mood="dim">
+
+    <div class="documentary-inner">
+
+        <header class="documentary-header">
+
+            <span class="documentary-line"></span>
+
+            <span class="documentary-eyebrow">
+                Thước phim tư liệu
+            </span>
+
+            <h2>
+                Những câu chuyện còn tiếp diễn
+            </h2>
+
+            <p>
+                Những hình ảnh chân thực về cuộc sống,
+                sự đồng hành và những nỗ lực không ngừng
+                của các em.
+            </p>
+
+        </header>
+
+        <figure class="documentary-frame"
+                id="documentaryFrame">
+
+            <div class="documentary-screen">
+
+                <iframe
+                    id="documentaryVideo"
+                    title="Video tư liệu"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                </iframe>
+
+                <div class="documentary-empty">
+
+                    <span class="documentary-play">
+                        ▶
+                    </span>
+
+                    <span>
+                        Thước phim tư liệu
+                    </span>
+
+                </div>
+
+            </div>
+
+            <figcaption class="documentary-caption">
+
+                <span class="documentary-caption-line">
+                </span>
+
+                <span>
+                    Lắng nghe, thấu hiểu và sẻ chia.
+                </span>
+
+                <span class="documentary-caption-line">
+                </span>
+
+            </figcaption>
+
+        </figure>
+
     </div>
+
+</div>
+
+<!-- ============ END VIDEO ============ -->
 
     <div class="step right" data-scene="8">
       <div class="card rv">
@@ -486,10 +567,10 @@
   }
 
   try {
-    await load('js/main.js?v=smooth-v7');
+    await load('js/main.js?v=opening-v11');
   } finally {
     cms?.finish();
-    await load('js/editor.js?v=smooth-v7');
+    await load('js/editor.js?v=documentary-v8');
   }
 })().catch(console.error);
 </script>

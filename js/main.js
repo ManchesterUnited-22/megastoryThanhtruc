@@ -262,24 +262,6 @@
     if (isPinned(fogWrap)) setScene(p < 0.5 ? 5 : 6);
   }
 
-  /* ---------- CHƯƠNG IV: ghép mảnh ---------- */
-  var puzzleWrap = $('puzzleWrap'), frame4 = $('frame4'), frameCap = $('frameCap');
-  var pieces = Array.prototype.slice.call(document.querySelectorAll('.piece'));
-  function updatePuzzle() {
-    if (!puzzleWrap) return;
-    var p = progressOf(puzzleWrap), W = innerWidth, H = innerHeight;
-    pieces.forEach(function (el, i) {
-      var t = clamp((p - i * 0.17) / 0.3, 0, 1);
-      var e = 1 - Math.pow(1 - t, 3);
-      var x = parseFloat(el.getAttribute('data-x')) * W / 100;
-      var y = parseFloat(el.getAttribute('data-y')) * H / 100;
-      var r = parseFloat(el.getAttribute('data-r'));
-      el.style.transform = 'translate3d(' + (x * (1 - e)) + 'px,' + (y * (1 - e)) + 'px,0) rotate(' + (r * (1 - e)) + 'deg)';
-      el.style.opacity = Math.min(1, t * 4);
-    });
-    frame4.classList.toggle('done', p > 0.72);
-    frameCap.style.opacity = smooth((p - 0.72) / 0.15);
-  }
 
   /* ---------- KHÉP LẠI: bình minh → khoảng lặng ---------- */
   var dawnWrap = $('dawnWrap'), sun = $('sun'), blackout = $('blackout');
@@ -309,7 +291,7 @@
     var h = document.documentElement.scrollHeight - innerHeight;
     bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
     updateTimeline(); updateReveal(); updateActs();
-    updateFog(); updatePuzzle(); updateDawn();
+    updateFog(); updateDawn();
     document.body.classList.toggle('inline-caption-scene', !!fogWrap && isPinned(fogWrap));
   }
   function onScroll() {
@@ -323,15 +305,116 @@
   update();
 
   /* ---------- MỞ ĐẦU: chia đôi (ảnh sang trái, chữ sang phải) ---------- */
-  var opening = $('opening');
-  if (opening) {
-    var openIt = function () { opening.classList.add('open'); };
-    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      openIt();
-    } else {
-      var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-      var cap1 = new Promise(function (r) { setTimeout(r, 1800); });
-      Promise.race([fontsReady, cap1]).then(function () { setTimeout(openIt, 700); });
+  /* ==========================================
+   OPENING - MANUAL SPACE CONTROL
+   ========================================== */
+
+var opening = $('opening');
+var openingTrigger = $('openingTrigger');
+
+if (opening) {
+
+    var hasOpened = false;
+
+    var isEditMode =
+        new URLSearchParams(location.search)
+            .get('edit') === '1';
+
+    // Luôn đóng cửa khi khởi tạo.
+    opening.classList.remove('open');
+
+    function openIt() {
+
+        if (hasOpened) return;
+
+        hasOpened = true;
+
+        // Mở hai cánh cửa đồng thời.
+        opening.classList.add('open');
+
+        document.body.classList.remove(
+            'opening-locked'
+        );
+
+        if (openingTrigger) {
+            openingTrigger.disabled = true;
+            openingTrigger.blur();
+
+            openingTrigger.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+        }
+
+        window.removeEventListener(
+            'keydown',
+            handleOpeningKey
+        );
+
+        // Cập nhật lại animation của trang.
+        requestAnimationFrame(function () {
+            update();
+        });
     }
-  }
+
+    function handleOpeningKey(event) {
+
+        if (hasOpened) return;
+
+        var target = event.target;
+
+        // Không can thiệp khi đang nhập văn bản.
+        if (
+            target &&
+            (
+                target.isContentEditable ||
+                target.matches?.(
+                    'input, textarea, select'
+                )
+            )
+        ) {
+            return;
+        }
+
+        if (
+            event.code === 'Space' ||
+            event.key === ' '
+        ) {
+
+            event.preventDefault();
+
+            if (event.repeat) return;
+
+            openIt();
+        }
+    }
+
+    if (isEditMode) {
+
+        // Editor được mở sẵn để thuận tiện chỉnh sửa.
+        openIt();
+
+    } else {
+
+        // Trang Main chờ người xem nhấn Space.
+        document.body.classList.add(
+            'opening-locked'
+        );
+
+        window.scrollTo(0, 0);
+
+        window.addEventListener(
+            'keydown',
+            handleOpeningKey
+        );
+
+        if (openingTrigger) {
+
+            openingTrigger.addEventListener(
+                'click',
+                openIt
+            );
+        }
+    }
+}
 })();

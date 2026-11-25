@@ -168,7 +168,7 @@
   const FRAME_SELECTOR = '.slot,.op-frame,.ph';
 
 const isSlot = el => el.matches(
-    '.ph,.slot,.op-frame,figure,.hero-media'
+    '.ph,.slot,.op-frame,figure,.hero-media,.documentary-screen'
 );
 
 function findMediaFrame(area) {
@@ -578,7 +578,60 @@ function findMediaFrame(area) {
       }
     };
   }
+function documentaryPlayer(target) {
+    return target?.closest('#documentaryFrame')
+        ?.querySelector('#documentaryVideo') || null;
+}
+
 function replaceMedia(item, target = selected) {
+
+    const player = documentaryPlayer(target);
+
+    if (player) {
+
+        if (!item.yt || !/^[\w-]{11}$/.test(item.yt)) {
+            $('ed-msg').textContent =
+                'Khung tư liệu chỉ nhận video YouTube.';
+            return;
+        }
+
+        const attrs = ['src', 'data-yt', 'style'];
+
+        const previous = attrs.map(name => [
+            name,
+            player.getAttribute(name)
+        ]);
+
+        cms?.mark(player, 'media');
+
+        player.src = youtubeUrl(item.yt);
+        player.dataset.yt = item.yt;
+
+        player.removeAttribute('style');
+
+        undo.push({
+            run() {
+                for (const [name, value] of previous) {
+                    if (value === null) {
+                        player.removeAttribute(name);
+                    } else {
+                        player.setAttribute(name, value);
+                    }
+                }
+            }
+        });
+
+        dirty = true;
+
+        cms?.touch();
+
+        select(player);
+
+        $('ed-msg').textContent =
+            'Đã cập nhật YouTube trong khung tư liệu.';
+
+        return;
+    }
     if (!target) return;
 
     const slot =
@@ -945,16 +998,40 @@ function replaceMedia(item, target = selected) {
         startEdit(el);
       }
       if (key === 'media') {
+
+    const screen = document.querySelector(
+        '.documentary-screen'
+    );
+
+    const r = screen?.getBoundingClientRect();
+
+    const x = area.x + area.width / 2;
+    const y = area.y + area.height / 2;
+
+    const player =
+        r &&
+        x >= r.left &&
+        x <= r.right &&
+        y >= r.top &&
+        y <= r.bottom
+            ? screen.querySelector('#documentaryVideo')
+            : null;
+
     askMedia(item => {
+
+        if (player) {
+            replaceMedia(item, player);
+            return;
+        }
+
         const el = makeMedia(item);
 
-        Object.assign(el.style, {
-            height: area.height + 'px',
-            display: 'block',
-            objectFit: 'cover',
-            margin: '0',
-            border: 'none'
-        });
+        el.style.height = area.height + 'px';
+        el.style.display = 'block';
+
+        if (!item.yt) {
+            el.style.objectFit = 'cover';
+        }
 
         putInArea(el, area);
     });
