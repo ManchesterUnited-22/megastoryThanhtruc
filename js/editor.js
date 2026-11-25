@@ -910,30 +910,16 @@ function replaceMedia(item, target = selected) {
         startEdit(el);
       }
       if (key === 'media') {
-
-    const targetFrame = findMediaFrame(area);
-
     askMedia(item => {
-
-        // Nếu vùng chèn trùng với placeholder,
-        // thay ảnh trực tiếp trong frame gốc.
-        if (targetFrame && targetFrame.isConnected) {
-
-            replaceMedia(item, targetFrame);
-
-            return;
-        }
-
-        // Nếu không có placeholder,
-        // chèn một ảnh mới độc lập như bình thường.
         const el = makeMedia(item);
 
-        el.style.height = area.height + 'px';
-        el.style.display = 'block';
-
-        if (!item.yt) {
-            el.style.objectFit = 'cover';
-        }
+        Object.assign(el.style, {
+            height: area.height + 'px',
+            display: 'block',
+            objectFit: 'cover',
+            margin: '0',
+            border: 'none'
+        });
 
         putInArea(el, area);
     });

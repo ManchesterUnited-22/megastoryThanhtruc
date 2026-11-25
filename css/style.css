@@ -536,3 +536,23 @@ main{position:relative;z-index:4}
 .ph > iframe {
     display: block;
 }
+/* REMOVE PLACEHOLDER UI */
+
+.slot::before,
+.op-frame::before,
+.ph::before {
+    content: none !important;
+    display: none !important;
+}
+
+.slot,
+.ph {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+}
+
+/* Không hiển thị ảnh nguồn bị lỗi */
+img[style*="display: none"] {
+    display: none !important;
+}
