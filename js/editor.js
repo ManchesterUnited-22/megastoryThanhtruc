@@ -390,8 +390,22 @@ function findMediaFrame(area) {
     addEventListener('mouseup', end, true);
   }
 
-  function startDrag(event) {
+function startDrag(event) {
     const el = selected;
+
+    if (!el) return;
+
+    if (
+        el.closest('.step .card') &&
+        el.matches(
+            'p,h1,h2,h3,h4,h5,h6,blockquote,ul,ol,li'
+        )
+    ) {
+        $('ed-msg').textContent =
+            'Văn bản tự căn trong khung. Hãy di chuyển cả khung.';
+
+        return;
+    }
     const [left, top] = offset(el);
     let moved = false;
 
@@ -437,7 +451,29 @@ function findMediaFrame(area) {
         if (direction.includes('s')) height += dy;
         if (direction.includes('n')) { height -= dy; y += dy; }
         if (/[ew]/.test(direction)) el.style.width = Math.max(20, width) + 'px';
-        if (/[ns]/.test(direction)) el.style.height = Math.max(20, height) + 'px';
+        if (/[ns]/.test(direction)) {
+
+    const autoHeight =
+        el.matches('.step .card') ||
+        (
+            el.closest('.step .card') &&
+            el.matches(
+                'p,h1,h2,h3,h4,h5,h6,blockquote,ul,ol,li'
+            )
+        );
+
+    if (autoHeight) {
+
+        el.style.removeProperty('height');
+        el.style.removeProperty('min-height');
+        el.style.removeProperty('aspect-ratio');
+
+    } else {
+
+        el.style.height =
+            Math.max(20, height) + 'px';
+    }
+}
         if (/[wn]/.test(direction)) move(el, x, y);
       });
     });

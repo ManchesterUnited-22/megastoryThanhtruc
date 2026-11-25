@@ -364,7 +364,53 @@
     template.content.append(safeFragment(html, urls));
     return template.innerHTML;
   }
+function normalizeTextFrames() {
 
+    const textSelector =
+        'p,h1,h2,h3,h4,h5,h6,blockquote,ul,ol,li';
+
+    document.querySelectorAll('.step .card')
+        .forEach(card => {
+
+            // Loại bỏ chiều cao cố định đã lưu.
+            [
+                'height',
+                'min-height',
+                'max-height',
+                'aspect-ratio'
+            ].forEach(property => {
+                card.style.removeProperty(property);
+            });
+
+            // Khung tự giãn theo nội dung.
+            card.style.height = 'auto';
+
+            card.querySelectorAll(textSelector)
+                .forEach(text => {
+
+                    // Chỉ xử lý bố cục, không sửa nội dung.
+                    [
+                        'position',
+                        'top',
+                        'right',
+                        'bottom',
+                        'left',
+                        'inset',
+                        'translate',
+                        'transform',
+                        'width',
+                        'height',
+                        'min-height',
+                        'max-height',
+                        'aspect-ratio',
+                        'margin'
+                    ].forEach(property => {
+                        text.style.removeProperty(property);
+                    });
+
+                });
+        });
+}
   function applyChanges() {
     if (!entries.size) return;
 
@@ -417,9 +463,13 @@
   }
 
   function finish() {
-    // main.js lấy tham chiếu cho các hiệu ứng trước khi bỏ phần tử đã xóa.
-    for (const el of removals) el.remove();
-  }
+
+    for (const el of removals) {
+        el.remove();
+    }
+
+    normalizeTextFrames();
+}
 
   function loadSDK() {
     if (window.supabase?.createClient) return Promise.resolve();
