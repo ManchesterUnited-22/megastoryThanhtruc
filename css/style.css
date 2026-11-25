@@ -2450,3 +2450,201 @@ figcaption:empty {
     }
 }
 
+/* ==========================================
+   CHAPTER II - FULL VIEWPORT FIX V17
+   ========================================== */
+
+html,
+body {
+    overflow-x: clip !important;
+}
+
+#actsWrap {
+    display: block !important;
+    position: relative !important;
+
+    width: 100% !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#actsWrap .acts-stick {
+    position: sticky !important;
+    top: 0 !important;
+
+    width: 100% !important;
+    height: 100dvh !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+}
+
+#actsWrap .act {
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    isolation: isolate;
+    overflow: hidden !important;
+}
+
+/* Ảnh thật được JavaScript xác định */
+
+#actsWrap .act img.act-fullscreen-media {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    aspect-ratio: auto !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+
+    transform: none !important;
+    translate: none !important;
+    scale: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: none !important;
+    border-radius: 0 !important;
+
+    clip-path: none !important;
+
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    filter: none !important;
+
+    z-index: 0 !important;
+}
+
+/* Ẩn ảnh lỗi và ảnh nền dư thừa */
+
+#actsWrap .act img.act-unused-media {
+    display: none !important;
+}
+
+/* Gradient giúp đọc chữ trên ảnh */
+
+#actsWrap .act::after {
+    content: "" !important;
+
+    position: absolute !important;
+    inset: 0 !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,.72),
+            rgba(0,0,0,.35) 40%,
+            transparent 80%
+        ),
+        linear-gradient(
+            to top,
+            rgba(0,0,0,.55),
+            transparent 55%
+        ) !important;
+
+    z-index: 1 !important;
+
+    pointer-events: none;
+}
+
+/* Chữ luôn nằm trên ảnh */
+
+#actsWrap .act .act-text {
+    position: absolute !important;
+
+    left: 6vw !important;
+    bottom: 12vh !important;
+
+    top: auto !important;
+    right: auto !important;
+
+    width: min(600px, 85vw) !important;
+    max-width: 85vw !important;
+
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    transform: none !important;
+    translate: none !important;
+
+    background: transparent !important;
+
+    z-index: 2000 !important;
+}
+
+#actsWrap .act-text h3 {
+    color: #fff5e8 !important;
+
+    font-size: clamp(48px, 7.5vw, 120px) !important;
+
+    text-shadow:
+        0 4px 25px rgba(0,0,0,.7) !important;
+}
+
+#actsWrap .act-text p {
+    color: #ffffff !important;
+
+    font-size: clamp(15px, 1.3vw, 21px) !important;
+
+    line-height: 1.8 !important;
+
+    text-shadow:
+        0 2px 12px rgba(0,0,0,.9) !important;
+}
+
+#actsWrap .act-text .tag {
+    color: #f4c68c !important;
+}
+
+#actsWrap .act-dots {
+    z-index: 3000 !important;
+}
+
+/* ==========================================
+   FIX OPENING TITLE HOVER
+   ========================================== */
+
+#opening:not(.open) .opening-title {
+    pointer-events: auto !important;
+}
+
+#opening.open .opening-title {
+    pointer-events: none !important;
+}
+
+#opening:not(.open) .opening-title:hover .opening-heading,
+#opening:not(.open) .opening-title:hover .opening-heading span {
+    color: #fff5df !important;
+
+    text-shadow:
+        0 0 10px rgba(255,224,174,.55),
+        0 0 30px rgba(255,191,110,.4),
+        0 0 60px rgba(255,174,80,.25) !important;
+}
+
