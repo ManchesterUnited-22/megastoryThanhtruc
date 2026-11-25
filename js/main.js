@@ -512,7 +512,7 @@
            1. HÒA MÉP ẢNH VÀO NỀN WEBSITE
            -------------------------------------- */
 
-        var fadeSize = vh * 0.08;
+        var fadeSize = vh * 0.06;
 
         var entering = smooth(
             clamp(

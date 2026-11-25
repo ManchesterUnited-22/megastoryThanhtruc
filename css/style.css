@@ -2797,4 +2797,312 @@ body {
     pointer-events: none;
 }
 
+/* ==========================================
+   OPENING - CINEMATIC LINE V20
+   ========================================== */
+
+#opening .opening-trigger {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 14px;
+
+    width: max-content;
+    padding: 15px 25px;
+    margin: 0;
+
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+
+    z-index: 20;
+
+    cursor: pointer;
+
+    animation: openingLineEnter 1.5s ease both;
+
+    transition:
+        opacity .7s ease,
+        visibility .7s ease;
+}
+
+/* Nhóm hai đường kẻ và chữ SPACE */
+
+#opening .opening-line-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 22px;
+}
+
+/* Xóa hoàn toàn hình dáng nút bấm cũ */
+
+#opening .opening-trigger .opening-key {
+    display: inline-block;
+
+    min-width: 0 !important;
+    width: auto !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 12px !important;
+    font-weight: 400;
+
+    letter-spacing: .45em;
+
+    color: #d8bc96 !important;
+
+    transform: none !important;
+
+    animation: openingSpacePulse 3s ease-in-out infinite;
+
+    transition:
+        color .5s ease,
+        text-shadow .5s ease;
+}
+
+/* Hai đường kẻ vàng đồng */
+
+#opening .opening-line {
+    display: block;
+
+    width: 48px;
+    height: 1px;
+
+    opacity: .7;
+
+    transition:
+        width .65s cubic-bezier(.22,1,.36,1),
+        opacity .5s ease,
+        box-shadow .5s ease;
+}
+
+#opening .opening-line.left {
+    background: linear-gradient(
+        to right,
+        transparent,
+        #d8b17b
+    );
+}
+
+#opening .opening-line.right {
+    background: linear-gradient(
+        to left,
+        transparent,
+        #d8b17b
+    );
+}
+
+/* Dòng chữ phía dưới */
+
+#opening .opening-hint {
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    font-size: 10px;
+    font-weight: 300;
+
+    letter-spacing: .18em;
+
+    color: rgba(222, 201, 172, .65);
+
+    transition:
+        color .5s ease,
+        opacity .5s ease;
+}
+
+/* ==========================================
+   HOVER - ÁNH SÁNG LAN TỎA
+   ========================================== */
+
+#opening .opening-trigger:hover .opening-line,
+#opening:has(.opening-title:hover) .opening-line {
+    width: 85px;
+
+    opacity: 1;
+
+    box-shadow:
+        0 0 8px rgba(255, 209, 145, .45);
+}
+
+#opening .opening-trigger:hover .opening-key,
+#opening:has(.opening-title:hover) .opening-key {
+    color: #fff1d5 !important;
+
+    animation: none !important;
+
+    box-shadow: none !important;
+
+    text-shadow:
+        0 0 12px rgba(255, 214, 154, .6),
+        0 0 25px rgba(255, 190, 110, .3);
+}
+
+#opening .opening-trigger:hover .opening-hint {
+    color: #ead3b3;
+}
+
+/* Tiêu đề chính sáng đồng thời */
+
+#opening:has(.opening-trigger:hover) .opening-heading,
+#opening:has(.opening-trigger:hover) .opening-heading span {
+    color: #fff5df !important;
+
+    text-shadow:
+        0 0 10px rgba(255,224,174,.45),
+        0 0 30px rgba(255,191,110,.3),
+        0 0 55px rgba(255,174,80,.2) !important;
+}
+
+/* ==========================================
+   KHI NHẤN SPACE MỞ CỬA
+   ========================================== */
+
+#opening.open .opening-trigger {
+    animation: none !important;
+
+    opacity: 0;
+    visibility: hidden;
+
+    pointer-events: none;
+}
+
+#opening.open .opening-line {
+    width: 0 !important;
+    opacity: 0;
+}
+
+#opening.open .opening-key,
+#opening.open .opening-hint {
+    animation: none !important;
+    opacity: 0;
+
+    transition: opacity .45s ease;
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+
+@keyframes openingLineEnter {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes openingSpacePulse {
+    0%, 100% {
+        opacity: .65;
+
+        text-shadow:
+            0 0 4px rgba(255,210,150,.1);
+    }
+
+    50% {
+        opacity: 1;
+
+        text-shadow:
+            0 0 14px rgba(255,210,150,.35);
+    }
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 720px) {
+
+    #opening .opening-trigger {
+        bottom: 9%;
+        gap: 12px;
+    }
+
+    #opening .opening-line-group {
+        gap: 15px;
+    }
+
+    #opening .opening-line {
+        width: 35px;
+    }
+
+    #opening .opening-trigger .opening-key {
+        font-size: 0 !important;
+    }
+
+    #opening .opening-trigger .opening-key::after {
+        content: 'MỞ';
+
+        font-size: 11px !important;
+        letter-spacing: .3em;
+    }
+
+    #opening .opening-hint {
+        font-size: 9px;
+    }
+
+    #opening .opening-trigger:hover .opening-line {
+        width: 50px;
+    }
+}
+
+@media (max-height: 650px) {
+    #opening .opening-trigger {
+        bottom: 4%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    #opening .opening-trigger,
+    #opening .opening-key,
+    #opening .opening-line,
+    #opening .opening-hint {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+/* SOFT CINEMATIC EDGE FADE */
+
+#actsWrap .acts-stick {
+    --edge-mask: linear-gradient(
+        to bottom,
+
+        transparent 0,
+        rgba(0,0,0,.25) calc(var(--fade-top) * .25),
+        rgba(0,0,0,.75) calc(var(--fade-top) * .65),
+        #000 var(--fade-top),
+
+        #000 calc(100% - var(--fade-bottom)),
+        rgba(0,0,0,.75) calc(100% - var(--fade-bottom) * .65),
+        rgba(0,0,0,.25) calc(100% - var(--fade-bottom) * .25),
+        transparent 100%
+    );
+
+    -webkit-mask-image: var(--edge-mask);
+    mask-image: var(--edge-mask);
+}
+
 

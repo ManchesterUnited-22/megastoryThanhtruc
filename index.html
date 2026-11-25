@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=cinematic-v19">
+<link rel="stylesheet" href="css/style.css?v=cinematic-v21">
 </head>
 <body data-tone="blood">
 
@@ -122,22 +122,27 @@
 
 <!-- NÚT SPACE - CINEMATIC -->
 
+<!-- OPENING - CINEMATIC LINE -->
+
 <button
     type="button"
     class="opening-trigger"
     id="openingTrigger"
-    aria-label="Nhấn Space để mở cánh cửa">
+    aria-label="Nhấn Space để bắt đầu câu chuyện">
 
-    <span class="opening-key-label">
-        NHẤN PHÍM
+    <span class="opening-line-group">
+
+        <span class="opening-line left"></span>
+
+        <span class="opening-key">SPACE</span>
+
+        <span class="opening-line right"></span>
+
     </span>
 
-    <span class="opening-key">
-        SPACE
+    <span class="opening-hint">
+        Bắt đầu câu chuyện
     </span>
-
-    <span class="opening-key-line"
-          aria-hidden="true"></span>
 
 </button>
 
@@ -553,7 +558,7 @@
   }
 
   try {
-    await load('js/main.js?v=cinematic-v18');
+    await load('js/main.js?v=cinematic-v21');
   } finally {
     cms?.finish();
     await load('js/editor.js?v=card-fix-14');
