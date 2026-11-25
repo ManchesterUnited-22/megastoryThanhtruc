@@ -2648,3 +2648,136 @@ body {
         0 0 60px rgba(255,174,80,.25) !important;
 }
 
+/* ==========================================
+   CINEMATIC FULLSCREEN TRANSITION
+   ========================================== */
+
+#actsWrap,
+#actsWrap .acts-stick {
+    background: transparent !important;
+}
+
+/* Hòa ảnh vào nền website khi cuộn vào/ra */
+
+#actsWrap .acts-stick {
+    --fade-top: 0px;
+    --fade-bottom: 0px;
+
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 var(--fade-top),
+        #000 calc(100% - var(--fade-bottom)),
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 var(--fade-top),
+        #000 calc(100% - var(--fade-bottom)),
+        transparent 100%
+    );
+
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+}
+
+/* Chuyển đổi giữa các phân cảnh */
+
+#actsWrap .act {
+    transition: none !important;
+    will-change: opacity;
+}
+
+/* Giữ nguyên độ rõ của chữ */
+
+#actsWrap .act-text {
+    z-index: 2000 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #actsWrap .acts-stick {
+        mask-image: none !important;
+        -webkit-mask-image: none !important;
+    }
+}
+
+/* ==========================================
+   CINEMATIC FULLSCREEN TRANSITION V18
+   ========================================== */
+
+#actsWrap,
+#actsWrap .acts-stick {
+    background: transparent !important;
+}
+
+/* Hòa mép ảnh vào nền thực tế của website */
+
+#actsWrap .acts-stick {
+
+    --fade-top: 0px;
+    --fade-bottom: 0px;
+
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 var(--fade-top),
+        #000 calc(100% - var(--fade-bottom)),
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 var(--fade-top),
+        #000 calc(100% - var(--fade-bottom)),
+        transparent 100%
+    );
+
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+/* Crossfade được điều khiển theo vị trí cuộn */
+
+#actsWrap .act {
+
+    transition: none !important;
+
+    will-change: opacity;
+}
+
+/* Giữ nguyên bố cục chữ */
+
+#actsWrap .act-text {
+
+    z-index: 2000 !important;
+
+    transition: none !important;
+}
+
+/* Giữ ba chấm chuyển cảnh trên ảnh */
+
+#actsWrap .act-dots {
+
+    z-index: 3000 !important;
+}
+
+/* Hỗ trợ người dùng tắt hiệu ứng chuyển động */
+
+@media (prefers-reduced-motion: reduce) {
+
+    #actsWrap .acts-stick {
+
+        -webkit-mask-image: none !important;
+
+        mask-image: none !important;
+    }
+}
+
+
+
