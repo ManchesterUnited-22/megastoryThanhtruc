@@ -1,32 +1,24 @@
 
-/* ==================================================
-   MAP BACKGROUND AUDIO
-   Nhạc nền dành riêng cho phân cảnh bản đồ
-================================================== */
-
 (() => {
     "use strict";
 
-    // ==============================
-    // CẤU HÌNH
-    // ==============================
-
-    const AUDIO_PATH = "assets/audio/map-background.mp3";
-
-    const START_VOLUME = 0.65;
-    const BACKGROUND_VOLUME = 0.15;
-    const FADE_DURATION = 5000;
-
-    const timeline = document.getElementById("timeline");
-
-    if (!timeline) {
-        console.warn("[MapAudio] Không tìm thấy timeline.");
-        return;
-    }
-
-    // ==============================
-    // KHỞI TẠO ÂM THANH
-    // ==============================
+    // Cấu hình âm thanh cho từng phân cảnh
+    const SCENES = [
+        {
+            id: "timeline",
+            path: "assets/audio/map-background.mp3",
+            startVolume: 0.65,
+            backgroundVolume: 0.15,
+            fadeDuration: 5
+        },
+        {
+            id: "c5",
+            path: "assets/audio/closing-background.mp3",
+            startVolume: 0.65,
+            backgroundVolume: 0.15,
+            fadeDuration: 5
+        }
+    ];
 
     const AudioContext =
         window.AudioContext || window.webkitAudioContext;
@@ -35,88 +27,101 @@
 
     const context = new AudioContext();
 
-    let audioBuffer = null;
+    let activeScene = null;
     let source = null;
     let gain = null;
-
-    let unlocked = false;
-    let insideMap = false;
     let scheduled = false;
 
-    // Tải MP3 trước khi cuộn đến bản đồ
-    fetch(AUDIO_PATH)
-        .then(response => {
+    // Khởi tạo từng phân cảnh
+    const scenes = SCENES.map(config => ({
+        ...config,
+        element: document.getElementById(config.id),
+        buffer: null
+    })).filter(scene => scene.element);
+
+    // Tải trước toàn bộ âm thanh
+    scenes.forEach(async scene => {
+        try {
+            const response = await fetch(scene.path);
+
             if (!response.ok) {
                 throw new Error("HTTP " + response.status);
             }
 
-            return response.arrayBuffer();
-        })
-        .then(data => context.decodeAudioData(data))
-        .then(buffer => {
-            audioBuffer = buffer;
+            const data = await response.arrayBuffer();
 
-            console.log("[MapAudio] MP3 đã sẵn sàng.");
+            scene.buffer =
+                await context.decodeAudioData(data);
 
-            checkPosition();
-        })
-        .catch(error => {
-            console.error("[MapAudio] Lỗi tải MP3:", error);
-        });
-
-    // ==============================
-    // MỞ QUYỀN PHÁT ÂM THANH
-    // ==============================
-
-    async function unlockAudio() {
-        try {
-            await context.resume();
-
-            unlocked = context.state === "running";
-
-            if (!unlocked) return;
-
-            console.log("[MapAudio] Đã mở quyền âm thanh.");
+            console.log(
+                "[SceneAudio] Đã tải:", scene.id
+            );
 
             checkPosition();
 
         } catch (error) {
-            console.warn("[MapAudio] Chưa thể phát:", error);
+            console.error(
+                "[SceneAudio] Lỗi tải:", scene.path, error
+            );
+        }
+    });
+
+    // Mở quyền âm thanh bằng Space hoặc chuột
+    async function unlockAudio() {
+        try {
+            await context.resume();
+            checkPosition();
+        } catch (error) {
+            console.warn("[SceneAudio]", error);
         }
     }
 
-    // Tận dụng phím Space ở Opening
     document.addEventListener("keydown", event => {
-        if (
-            event.code === "Space" ||
-            event.key === " "
-        ) {
+        if (event.code === "Space") {
             unlockAudio();
         }
     }, true);
 
-    // Hỗ trợ thao tác chuột và màn hình cảm ứng
     document.addEventListener("pointerdown", () => {
         if (context.state !== "running") {
             unlockAudio();
         }
     }, true);
 
-    // ==============================
-    // PHÁT NHẠC TỪ ĐẦU
-    // ==============================
+    // Dừng âm thanh hiện tại
+    function stopMusic() {
+        if (source) {
+            try {
+                source.stop();
+            } catch (_) {}
 
-    function startMusic() {
-        if (!unlocked || !audioBuffer || source) return;
+            source.disconnect();
+            source = null;
+        }
 
+        if (gain) {
+            gain.disconnect();
+            gain = null;
+        }
+
+        activeScene = null;
+    }
+
+    // Phát âm thanh của phân cảnh
+    function startMusic(scene) {
+        if (!scene.buffer) return;
         if (context.state !== "running") return;
+
+        // Không phát lại liên tục khi đang cuộn
+        if (activeScene === scene && source) return;
+
+        // Dừng nhạc cũ trước khi phát nhạc mới
+        stopMusic();
 
         source = context.createBufferSource();
         gain = context.createGain();
 
-        source.buffer = audioBuffer;
-
-        // Lặp lại nếu vẫn đang ở bản đồ
+        source.buffer = scene.buffer;
         source.loop = true;
 
         source.connect(gain);
@@ -124,79 +129,57 @@
 
         const now = context.currentTime;
 
-        // Âm lượng ban đầu: 65%
-        gain.gain.setValueAtTime(START_VOLUME, now);
-
-        // Giảm dần xuống 15% trong 5 giây
-        gain.gain.linearRampToValueAtTime(
-            BACKGROUND_VOLUME,
-            now + FADE_DURATION / 1000
+        gain.gain.setValueAtTime(
+            scene.startVolume,
+            now
         );
 
-        // Luôn phát từ giây thứ 0
+        gain.gain.linearRampToValueAtTime(
+            scene.backgroundVolume,
+            now + scene.fadeDuration
+        );
+
         source.start(0, 0);
 
-        console.log("[MapAudio] Bắt đầu phát nhạc.");
+        activeScene = scene;
+
+        console.log(
+            "[SceneAudio] Đang phát:", scene.id
+        );
     }
 
-    // ==============================
-    // DỪNG NHẠC
-    // ==============================
-
-    function stopMusic() {
-        if (!source) return;
-
-        const oldSource = source;
-        const oldGain = gain;
-
-        source = null;
-        gain = null;
-
-        try {
-            oldSource.stop();
-        } catch (error) {
-            console.warn("[MapAudio]", error);
-        }
-
-        oldSource.disconnect();
-
-        if (oldGain) {
-            oldGain.disconnect();
-        }
-
-        console.log("[MapAudio] Đã dừng nhạc.");
-    }
-
-    // ==============================
-    // KIỂM TRA VỊ TRÍ CUỘN
-    // ==============================
-
+    // Xác định phân cảnh hiện tại
     function checkPosition() {
-        const rect = timeline.getBoundingClientRect();
+        if (document.hidden) {
+            stopMusic();
+            return;
+        }
 
-        const viewportHeight = window.innerHeight;
+        const triggerPoint = window.innerHeight * 0.5;
 
-        // Mốc kích hoạt tại giữa màn hình
-        const triggerPoint = viewportHeight * 0.5;
+        const currentScene = scenes.find(scene => {
+            const rect =
+                scene.element.getBoundingClientRect();
 
-        const isVisible =
-            rect.top <= triggerPoint &&
-            rect.bottom > triggerPoint &&
-            !document.hidden;
+            return (
+                rect.top <= triggerPoint &&
+                rect.bottom > triggerPoint
+            );
+        });
 
-        insideMap = isVisible;
+        if (!currentScene) {
+            stopMusic();
+            return;
+        }
 
-        if (insideMap) {
-            startMusic();
-        } else {
+        if (activeScene !== currentScene) {
             stopMusic();
         }
+
+        startMusic(currentScene);
     }
 
-    // ==============================
-    // THEO DÕI SCROLL
-    // ==============================
-
+    // Theo dõi thao tác cuộn
     function handleScroll() {
         if (scheduled) return;
 
@@ -204,7 +187,6 @@
 
         requestAnimationFrame(() => {
             checkPosition();
-
             scheduled = false;
         });
     }
@@ -215,7 +197,6 @@
 
     window.addEventListener("resize", handleScroll);
 
-    // Dừng nhạc khi chuyển tab
     document.addEventListener(
         "visibilitychange",
         checkPosition
@@ -223,7 +204,8 @@
 
     window.addEventListener("pagehide", stopMusic);
 
-    // Kiểm tra vị trí ban đầu
+    window.addEventListener("pageshow", checkPosition);
+
     checkPosition();
 
 })();
