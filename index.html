@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=layout-fix-4">
 </head>
 <body data-tone="blood">
 
@@ -409,15 +409,15 @@
       <div class="puzzle-stick">
         <div class="frame4" id="frame4">
           <div class="piece p1" data-x="-110" data-y="0" data-r="-8">
-            <img src="assets/images/c4.jpg" alt="" onerror="this.remove()">
+            <img src="assets/images/c4.jpg" alt="" onerror="this.style.display='none'">
             <div class="lab"><span class="tag">Trước mắt</span><p>Thăm hỏi, trao quà, hỗ trợ vật chất</p></div>
           </div>
           <div class="piece p2" data-x="70" data-y="-110" data-r="9">
-            <img src="assets/images/c4.jpg" alt="" onerror="this.remove()">
+            <img src="assets/images/c4.jpg" alt="" onerror="this.style.display='none'">
             <div class="lab"><span class="tag">Lâu dài</span><p>Đồng hành và chính sách thiết thực</p></div>
           </div>
           <div class="piece p3" data-x="40" data-y="110" data-r="-7">
-            <img src="assets/images/c4.jpg" alt="" onerror="this.remove()">
+            <img src="assets/images/c4.jpg" alt="" onerror="this.style.display='none'">
             <div class="lab"><span class="tag">Thế hệ trẻ</span><p>Nhận thức và hành động cụ thể</p></div>
           </div>
         </div>
@@ -463,8 +463,8 @@
 </main>
 
 <script src="js/config.js"></script>
-<script src="js/layout.js?v=blue-publish-3"></script>
-<script src="js/cms.js?v=blue-publish-3"></script>
+<script src="js/layout.js?v=layout-fix-4"></script>
+<script src="js/cms.js?v=layout-fix-4"></script>
 <script>
 (async () => {
   function load(src) {
@@ -486,12 +486,30 @@
   }
 
   try {
-    await load('js/main.js?v=blue-publish-3');
+    await load('js/main.js?v=layout-fix-4');
   } finally {
     cms?.finish();
-    await load('js/editor.js?v=blue-publish-3');
+    await load('js/editor.js?v=layout-fix-4');
   }
 })().catch(console.error);
+</script>
+<script>
+// Keep original frame placeholders until their actual media is ready.
+(() => {
+  function sync(frame) {
+    const media = [...frame.querySelectorAll('img,video,iframe')];
+    frame.classList.toggle('has-media', media.some(el =>
+      el.tagName === 'IMG' ? el.complete && el.naturalWidth > 0 :
+      el.tagName === 'VIDEO' ? el.readyState >= 2 : !!el.getAttribute('src')));
+  }
+  function scan() { document.querySelectorAll('.slot,.op-frame').forEach(sync); }
+  for (const event of ['load','error','loadeddata']) document.addEventListener(event, e => {
+    const frame = e.target.closest?.('.slot,.op-frame');
+    if (frame) sync(frame);
+  }, true);
+  new MutationObserver(scan).observe(document.body, {childList:true,subtree:true,attributes:true,attributeFilter:['src']});
+  scan();
+})();
 </script>
 </body>
 </html>

@@ -165,7 +165,7 @@
   for (const [name, value] of FONTS) font.add(new Option(name, value));
 
   const isMedia = el => el.matches(MEDIA_SEL);
-  const isSlot = el => el.matches('.ph,figure,.hero-media');
+  const isSlot = el => el.matches('.ph,.slot,.op-frame,figure,.hero-media');
   const inUI = node => !!(node?.nodeType === 1 ? node.closest('#ed-ui') : node?.parentElement?.closest('#ed-ui'));
 
   function offset(el) {
@@ -517,6 +517,7 @@
 
       cms?.mark(old, 'media');
       old.removeAttribute('onerror');
+      old.style.removeProperty('display');
       old.src = replacement.src;
       if (item.yt) old.dataset.yt = item.yt;
       if (old.matches('video')) old.load();
@@ -552,7 +553,7 @@
       undo.push({ run: () => replacement.replaceWith(old) });
       select(replacement);
     } else {
-      const slot = selected.matches('.ph') ? selected : selected.querySelector('.ph') || selected;
+      const slot = selected.matches('.ph,.slot,.op-frame') ? selected : selected.querySelector('.ph,.slot,.op-frame') || selected;
       replacement.style.cssText = item.yt
         ? 'display:block;width:100%;height:100%;border:0'
         : 'display:block;width:100%;height:100%;object-fit:cover';
@@ -585,7 +586,13 @@
       top: (area.y + scrollY) + 'px',
       width: area.width + 'px'
     });
-    document.body.append(el);
+    // Anchor to the visible scene rather than a document-wide scroll coordinate.
+    const host = area.host && area.host.isConnected ? area.host : document.querySelector('main');
+    if (!host) return;
+    const bounds = host.getBoundingClientRect();
+    el.style.left = (area.x - bounds.left) + 'px';
+    el.style.top = (area.y - bounds.top) + 'px';
+    host.append(el);
     cms?.insert(el);
     const rect = el.getBoundingClientRect();
     el.style.left = (parseFloat(el.style.left) + area.x - rect.left) + 'px';
@@ -654,6 +661,13 @@
         rect.style.display = 'none';
         return;
       }
+      const candidates = document.querySelectorAll('.fog-panel,.act,.card,.step,section.chapter');
+      const x = zone.x + zone.width / 2, y = zone.y + zone.height / 2;
+      const hits = [...candidates].filter(el => {
+        const r = el.getBoundingClientRect(), st = getComputedStyle(el);
+        return st.visibility !== 'hidden' && +st.opacity > .5 && r.left <= x && r.right >= x && r.top <= y && r.bottom >= y;
+      });
+      zone.host = hits.reverse().find(el => el.matches('.fog-panel,.act,.card')) || hits[0];
       area = zone;
       const bottom = zone.y + zone.height;
       menu.style.left = Math.max(8, Math.min(zone.x, innerWidth - 380)) + 'px';
@@ -914,6 +928,8 @@
     if (image) {
       const previous = image.getAttribute('src');
       cms.mark(image, 'media');
+      image.removeAttribute('onerror');
+      image.style.removeProperty('display');
       image.src = url;
       undo.push({
         run() {
@@ -926,7 +942,7 @@
       el.src = url;
       el.alt = '';
       el.style.width = '100%';
-      const slot = selected.matches('.ph') ? selected : selected.querySelector('.ph') || selected;
+      const slot = selected.matches('.ph,.slot,.op-frame') ? selected : selected.querySelector('.ph,.slot,.op-frame') || selected;
       slot.append(el);
       cms.insert(el);
       undo.push({ run: () => el.remove() });

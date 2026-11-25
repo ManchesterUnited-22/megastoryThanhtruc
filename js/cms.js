@@ -382,7 +382,8 @@
       const el = safeFragment(change.insert).firstElementChild;
       if (parent && el) {
         el.setAttribute(KEY, key);
-        parent.append(el);
+        const before = lookup(change.before);
+        parent.insertBefore(el, before?.parentElement === parent ? before : null);
       }
     }
 
@@ -399,6 +400,7 @@
         const replacement = safeFragment(change.media).firstElementChild;
         if (replacement?.matches('img,video,iframe') && el.matches('img,video,iframe')) {
           replacement.setAttribute(KEY, key);
+          if (replacement.matches('img') && replacement.style.display === 'none') replacement.style.removeProperty('display');
           el.replaceWith(replacement);
           el = replacement;
         }
@@ -560,8 +562,9 @@
         if (flags.has('deleted') || change.insert) change.deleted = true;
       } else {
         delete change.deleted;
-        if (flags.has('insert')) {
+        if (flags.has('insert') || change.insert) {
           change.parent = el.parentElement === document.body ? '@' : el.parentElement.getAttribute(KEY);
+          change.before = el.nextElementSibling?.getAttribute(KEY) || null;
           change.insert = el.outerHTML;
         }
         if (flags.has('text')) change.text = el.innerHTML;
