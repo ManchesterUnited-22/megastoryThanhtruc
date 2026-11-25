@@ -417,4 +417,35 @@ if (opening) {
         }
     }
 }
+/* ==========================================
+   CLEAN DEFAULT CAPTIONS
+   ========================================== */
+
+function cleanDefaultCaptions() {
+
+    var pattern =
+        /^(ảnh|video)\s*\d+\s*[·:\-]\s*chú thích(?:\s+ảnh|\s+video(?:\s+chính)?)?\s*$/i;
+
+    document.querySelectorAll(
+        'figcaption, .op-cap, #cap'
+    ).forEach(function (el) {
+
+        var text = el.textContent.trim();
+
+        if (pattern.test(text)) {
+            el.textContent = '';
+        }
+
+        if (!el.textContent.trim()) {
+            el.style.display = 'none';
+        }
+    });
+}
+
+if (
+    new URLSearchParams(location.search)
+        .get('edit') !== '1'
+) {
+    cleanDefaultCaptions();
+}
 })();

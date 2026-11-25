@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=opening-v11">
+<link rel="stylesheet" href="css/style.css?v=opening-v13">
 </head>
 <body data-tone="blood">
 
@@ -21,35 +21,35 @@
     <video src="assets/video/intro.mp4" muted loop playsinline preload="auto" onerror="this.style.display='none'"></video>
   </div>
 
-  <div class="layer" style="--bg:#5a3a24" data-cap="Ảnh 02 · chú thích">
+  <div class="layer" style="--bg:#5a3a24" data-cap="">
     <img src="assets/images/c1.jpg" alt="" onerror="this.style.display='none'">
   </div>
 
-  <div class="layer" style="--bg:#4b3524" data-cap="Video 01 · chú thích">
+  <div class="layer" style="--bg:#4b3524" data-cap="">
     <video src="assets/video/clip-1.mp4" muted loop playsinline preload="metadata" onerror="this.style.display='none'"></video>
   </div>
 
-  <div class="layer" style="--bg:#573826" data-cap="Ảnh 03 · chú thích">
+  <div class="layer" style="--bg:#573826" data-cap="">
     <img src="assets/images/c2.jpg" alt="" onerror="this.style.display='none'">
   </div>
 
-  <div class="layer" style="--bg:#3f2d20" data-cap="Video 02 · chú thích video chính">
+  <div class="layer" style="--bg:#3f2d20" data-cap="">
     <video src="assets/video/story-main.mp4" muted loop playsinline preload="metadata" onerror="this.style.display='none'"></video>
   </div>
 
-  <div class="layer" style="--bg:#4d3a22" data-cap="Ảnh 04 · chú thích">
+  <div class="layer" style="--bg:#4d3a22" data-cap="">
     <img src="assets/images/c3.jpg" alt="" onerror="this.style.display='none'">
   </div>
 
-  <div class="layer" style="--bg:#3a2c1c" data-cap="Ảnh 05 · chú thích">
+  <div class="layer" style="--bg:#3a2c1c" data-cap="">
     <img src="assets/images/c3b.jpg" alt="" onerror="this.style.display='none'">
   </div>
 
-  <div class="layer" style="--bg:#54402a" data-cap="Ảnh 06 · chú thích">
+  <div class="layer" style="--bg:#54402a" data-cap="">
     <img src="assets/images/c4.jpg" alt="" onerror="this.style.display='none'">
   </div>
 
-  <div class="layer" style="--bg:#483620" data-cap="Video 03 · chú thích">
+  <div class="layer" style="--bg:#483620" data-cap="">
     <video src="assets/video/clip-2.mp4" muted loop playsinline preload="metadata" onerror="this.style.display='none'"></video>
   </div>
 
@@ -85,7 +85,7 @@
 
       <!-- PHÍA SAU CỬA: trái = khung ảnh, phải = nội dung -->
       <div class="op-img">
-        <div class="op-frame" data-label="Khung ảnh mở đầu · đặt ảnh tại assets/images/open.jpg">
+        <div class="op-frame" data-label="">
           <img src="assets/images/open.jpg" alt="" onerror="this.style.display='none'">
         </div>
         <p class="op-cap op-item" style="--d:2s"><span>Nguồn: huengaynay.vn </span></p>
@@ -95,41 +95,41 @@
         <a class="cue op-item" style="--d:1.8s" href="#timeline"><b>↓</b> Cuộn để đọc</a>
       </div>
 
-      <!-- HAI CÁNH CỬA: tiêu đề nằm trên cửa, mở ra thì chữ tách đôi -->
-      <div class="op-door l">
-        <div class="dt">
-          <div class="eyebrow">Megastory</div>
-          <div class="op-door r" aria-hidden="true"></div>
-          <h1 class="dt-h1"><span>Những mảnh đời</span><span>sau cánh cửa</span></h1>
-          <p class="dt-sub">trung tâm chăm sóc trẻ em chất độc da cam</p>
-        </div>
-      </div>
-      <div class="op-door r" aria-hidden="true">
-        <div class="dt">
-          <div class="eyebrow">Megastory <i></i> Mở đầu</div>
-          <div class="dt-h1"><span>Những mảnh đời</span><span>sau cánh cửa</span></div>
-          <p class="dt-sub">trung tâm chăm sóc trẻ em chất độc da cam</p>
-        </div>
-      </div>
+      <!-- HAI CÁNH CỬA -->
 
-<!-- NÚT MỞ CÁNH CỬA -->
+<div class="op-door l" aria-hidden="true"></div>
+
+<div class="op-door r" aria-hidden="true"></div>
+
+<!-- TIÊU ĐỀ OPENING -->
+
+<div class="opening-title">
+
+    <div class="opening-eyebrow">
+        MEGASTORY
+    </div>
+
+    <h1 class="opening-heading">
+        <span>Những mảnh đời</span>
+        <span>sau cánh cửa</span>
+    </h1>
+
+    <p class="opening-subtitle">
+        Trung tâm chăm sóc trẻ em chất độc da cam
+    </p>
+
+</div>
+
+<!-- NÚT SPACE -->
 
 <button
     type="button"
     class="opening-trigger"
     id="openingTrigger"
-    aria-label="Mở cánh cửa">
+    aria-label="Nhấn Space để mở cánh cửa">
 
     <span class="opening-key">
         SPACE
-    </span>
-
-    <span class="opening-hint">
-        Nhấn để mở cánh cửa
-    </span>
-
-    <span class="opening-mobile-hint">
-        Chạm để mở cánh cửa
     </span>
 
 </button>
@@ -373,10 +373,10 @@
         <!-- 2 · khung ảnh TRÁI, chữ PHẢI -->
         <div class="fog-panel has-frame">
           <figure class="fog-frame">
-            <div class="slot" data-label="Ảnh 05 · đặt ảnh tại assets/images/c3-homnay.jpg">
+            <div class="slot" data-label="">
               <img src="assets/images/c3-homnay.jpg" alt="" onerror="this.style.display='none'">
             </div>
-            <figcaption>Ảnh 05 · chú thích ảnh</figcaption>
+            <figcaption></figcaption>
           </figure>
           <div class="txt">
             <span class="tag">Hôm nay</span>
@@ -391,20 +391,20 @@
             <p>Khi người thân không còn đủ sức khỏe để tiếp tục chăm sóc, câu hỏi về nơi sinh sống, điều kiện hỗ trợ và khả năng hòa nhập cộng đồng của các em trở thành nỗi trăn trở lớn.</p>
           </div>
           <figure class="fog-frame faded">
-            <div class="slot" data-label="Ảnh 06 · đặt ảnh tại assets/images/c3-maisau.jpg">
+            <div class="slot" data-label="">
               <img src="assets/images/c3-maisau.jpg" alt="" onerror="this.style.display='none'">
             </div>
-            <figcaption>Ảnh 06 · chú thích ảnh</figcaption>
+            <figcaption></figcaption>
           </figure>
         </div>
 
         <!-- 4 · khung ảnh TRÁI, chữ PHẢI -->
         <div class="fog-panel has-frame">
           <figure class="fog-frame">
-            <div class="slot" data-label="Ảnh 07 · đặt ảnh tại assets/images/c3-trungtam.jpg">
+            <div class="slot" data-label="">
               <img src="assets/images/c3-trungtam.jpg" alt="" onerror="this.style.display='none'">
             </div>
-            <figcaption>Ảnh 07 · chú thích ảnh</figcaption>
+            <figcaption></figcaption>
           </figure>
           <div class="txt">
             <p>Bởi vậy, vai trò của các trung tâm không chỉ nằm ở việc hỗ trợ trẻ trong hiện tại, mà còn gắn với yêu cầu xây dựng những điều kiện chăm sóc lâu dài. Bên cạnh hỗ trợ y tế và phục hồi chức năng, trẻ cần được tạo cơ hội tham gia các hoạt động phù hợp, phát triển khả năng cá nhân và được tôn trọng trong môi trường sống.</p>
@@ -567,7 +567,7 @@
   }
 
   try {
-    await load('js/main.js?v=opening-v11');
+    await load('js/main.js?v=opening-v13');
   } finally {
     cms?.finish();
     await load('js/editor.js?v=documentary-v8');

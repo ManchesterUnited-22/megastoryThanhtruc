@@ -1023,63 +1023,7 @@ img[style*="display: none"] {
         width: 14px;
     }
 }
-/* ==========================================
-   FIX CONTENT OVERFLOW
-   ========================================== */
 
-.step > .card {
-    box-sizing: border-box;
-
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-
-    overflow: visible !important;
-
-    align-self: center;
-
-    overflow-wrap: anywhere;
-    word-break: normal;
-}
-
-.card p,
-.card h1,
-.card h2,
-.card h3,
-.card h4,
-.card blockquote {
-    height: auto !important;
-    max-height: none !important;
-
-    white-space: normal;
-    overflow-wrap: anywhere;
-
-    box-sizing: border-box;
-}
-
-.card p {
-    line-height: 1.75;
-}
-
-.card img,
-.card video,
-.card iframe {
-    max-width: 100%;
-}
-
-.step {
-    box-sizing: border-box;
-}
-
-@media (max-width: 720px) {
-    .step > .card {
-        max-width: 100% !important;
-
-        height: auto !important;
-
-        padding: 1.4rem;
-    }
-}
 /* ==========================================
    MANUAL OPENING
    ========================================== */
@@ -1287,4 +1231,411 @@ body.opening-locked #rail {
     #opening .opening-trigger {
         transition: none !important;
     }
+}
+/* ==========================================
+   OPENING TITLE - FINAL LAYOUT
+   ========================================== */
+
+#opening {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+/* Hai cánh cửa */
+
+#opening .op-door {
+    z-index: 10;
+
+    transition:
+        transform 1.8s
+        cubic-bezier(.76, 0, .24, 1);
+
+    will-change: transform;
+}
+
+/* Tiêu đề độc lập với hai cánh cửa */
+
+.opening-title {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 100%;
+    max-width: 1400px;
+
+    padding: 0 clamp(20px, 5vw, 80px);
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    z-index: 15;
+
+    pointer-events: none;
+
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+        opacity .55s ease,
+        transform .8s ease,
+        visibility .55s ease;
+}
+
+/* MEGASTORY */
+
+.opening-eyebrow {
+    margin-bottom: clamp(24px, 4vh, 42px);
+
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    font-size: clamp(10px, 1vw, 14px);
+
+    font-weight: 500;
+
+    letter-spacing: .4em;
+
+    color: #c9b5a2;
+}
+
+/* Tiêu đề chính */
+
+.opening-heading {
+    margin: 0;
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: clamp(34px, 7vw, 120px);
+
+    font-weight: 700;
+
+    line-height: 1.12;
+
+    letter-spacing: -.025em;
+
+    color: #f4ede3;
+
+    overflow: visible;
+}
+
+.opening-heading span {
+    display: block;
+
+    white-space: normal;
+
+    overflow: visible;
+}
+
+/* Dòng phụ đề */
+
+.opening-subtitle {
+    max-width: 900px;
+
+    margin: clamp(22px, 3vh, 36px) auto 0;
+
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    font-size: clamp(10px, 1.1vw, 16px);
+
+    font-weight: 500;
+
+    line-height: 1.8;
+
+    letter-spacing: .22em;
+
+    text-transform: uppercase;
+
+    color: #df7857;
+}
+
+/* Nút SPACE */
+
+#opening .opening-trigger {
+    position: absolute;
+
+    left: 50%;
+    bottom: 9%;
+
+    transform: translateX(-50%);
+
+    z-index: 20;
+
+    padding: 0;
+
+    margin: 0;
+
+    background: transparent;
+
+    border: none;
+
+    cursor: pointer;
+}
+
+#opening .opening-key {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 90px;
+
+    padding: 12px 24px;
+
+    box-sizing: border-box;
+
+    border: 1px solid
+        rgba(201, 170, 130, .5);
+
+    border-radius: 5px;
+
+    background:
+        rgba(201, 170, 130, .06);
+
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    letter-spacing: .2em;
+
+    color: #e4cfb6;
+
+    transition:
+        background .25s ease,
+        box-shadow .25s ease,
+        transform .25s ease;
+}
+
+#opening .opening-trigger:hover .opening-key {
+    background:
+        rgba(201, 170, 130, .15);
+
+    box-shadow:
+        0 0 20px rgba(201, 170, 130, .12);
+
+    transform: translateY(-2px);
+}
+
+/* Khi nhấn SPACE */
+
+#opening.open .opening-title {
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform:
+        translate(-50%, -53%);
+}
+
+#opening.open .opening-trigger {
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+}
+
+/* Đợi tiêu đề mờ đi rồi mở cửa */
+
+#opening.open .op-door {
+    transition-delay: .3s;
+}
+
+/* MOBILE */
+
+@media (max-width: 720px) {
+
+    .opening-title {
+        top: 46%;
+
+        padding: 0 20px;
+    }
+
+    .opening-heading {
+        font-size: clamp(30px, 8.5vw, 60px);
+
+        line-height: 1.2;
+    }
+
+    .opening-eyebrow {
+        margin-bottom: 24px;
+    }
+
+    .opening-subtitle {
+        font-size: 10px;
+
+        letter-spacing: .13em;
+
+        margin-top: 24px;
+    }
+
+    #opening .opening-trigger {
+        bottom: 12%;
+    }
+
+    #opening .opening-key {
+        font-size: 0;
+    }
+
+    #opening .opening-key::after {
+        content: 'MỞ';
+
+        font-size: 12px;
+    }
+}
+
+/* Màn hình thấp */
+
+@media (max-height: 650px) {
+
+    .opening-title {
+        top: 43%;
+    }
+
+    .opening-heading {
+        font-size: clamp(30px, 6vw, 85px);
+    }
+
+    .opening-eyebrow {
+        margin-bottom: 16px;
+    }
+
+    .opening-subtitle {
+        margin-top: 16px;
+    }
+
+    #opening .opening-trigger {
+        bottom: 6%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .opening-title,
+    #opening .op-door,
+    #opening .opening-trigger {
+        transition: none !important;
+    }
+}
+/* ==========================================
+   FIX TEXT FRAME OVERFLOW V2
+   ========================================== */
+
+.step .card {
+    box-sizing: border-box !important;
+
+    display: flow-root !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+
+    padding: clamp(20px, 2.5vw, 40px);
+
+    max-width: 100% !important;
+
+    flex-shrink: 0;
+}
+
+/* Đưa văn bản về luồng bố cục tự nhiên */
+
+.step .card > p,
+.step .card > h1,
+.step .card > h2,
+.step .card > h3,
+.step .card > h4,
+.step .card > blockquote,
+.step .card > ul,
+.step .card > ol {
+
+    position: relative !important;
+
+    inset: auto !important;
+
+    width: auto !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    transform: none !important;
+    translate: none !important;
+
+    float: none !important;
+
+    white-space: normal !important;
+
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+
+    box-sizing: border-box !important;
+}
+
+/* Khoảng cách giữa các đoạn */
+
+.step .card p {
+    line-height: 1.7;
+    margin: 0;
+}
+
+.step .card p + p {
+    margin-top: 1rem;
+}
+
+/* Responsive */
+
+@media (max-width: 720px) {
+
+    .step .card {
+        width: 100% !important;
+        max-width: 100% !important;
+
+        padding: 20px !important;
+    }
+
+    .step .card p {
+        font-size: clamp(
+            15px,
+            4.2vw,
+            19px
+        ) !important;
+    }
+}
+/* ==========================================
+   REMOVE DEFAULT PLACEHOLDERS
+   ========================================== */
+
+.slot::before,
+.op-frame::before,
+.ph::before {
+    content: none !important;
+    display: none !important;
+}
+
+.slot,
+.op-frame,
+.ph {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Ẩn chú thích rỗng */
+
+figcaption:empty {
+    display: none !important;
+}
+
+/* Loại bỏ chú thích nền cố định */
+
+#cap {
+    display: none !important;
 }
