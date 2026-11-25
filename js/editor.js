@@ -165,7 +165,82 @@
   for (const [name, value] of FONTS) font.add(new Option(name, value));
 
   const isMedia = el => el.matches(MEDIA_SEL);
-  const isSlot = el => el.matches('.ph,.slot,.op-frame,figure,.hero-media');
+  const FRAME_SELECTOR = '.slot,.op-frame,.ph';
+
+const isSlot = el => el.matches(
+    '.ph,.slot,.op-frame,figure,.hero-media'
+);
+
+function findMediaFrame(area) {
+    const frames = document.querySelectorAll(FRAME_SELECTOR);
+
+    let bestFrame = null;
+    let bestScore = 0;
+
+    for (const frame of frames) {
+        const rect = frame.getBoundingClientRect();
+        const style = getComputedStyle(frame);
+
+        if (
+            rect.width < 10 ||
+            rect.height < 10 ||
+            style.display === 'none' ||
+            style.visibility === 'hidden'
+        ) continue;
+
+        let visible = true;
+        let parent = frame;
+
+        while (parent && parent !== document.body) {
+            const s = getComputedStyle(parent);
+
+            if (
+                s.display === 'none' ||
+                s.visibility === 'hidden' ||
+                Number(s.opacity) < 0.5
+            ) {
+                visible = false;
+                break;
+            }
+
+            parent = parent.parentElement;
+        }
+
+        if (!visible) continue;
+
+        const left = Math.max(area.x, rect.left);
+        const top = Math.max(area.y, rect.top);
+
+        const right = Math.min(
+            area.x + area.width,
+            rect.right
+        );
+
+        const bottom = Math.min(
+            area.y + area.height,
+            rect.bottom
+        );
+
+        const overlap =
+            Math.max(0, right - left) *
+            Math.max(0, bottom - top);
+
+        const areaSize = area.width * area.height;
+        const frameSize = rect.width * rect.height;
+
+        const score = overlap / Math.max(
+            1,
+            Math.min(areaSize, frameSize)
+        );
+
+        if (score >= 0.5 && score > bestScore) {
+            bestScore = score;
+            bestFrame = frame;
+        }
+    }
+
+    return bestFrame;
+}
   const inUI = node => !!(node?.nodeType === 1 ? node.closest('#ed-ui') : node?.parentElement?.closest('#ed-ui'));
 
   function offset(el) {
@@ -503,67 +578,214 @@
       }
     };
   }
+function replaceMedia(item, target = selected) {
+    if (!target) return;
 
-  function replaceMedia(item) {
-    if (!selected) return;
-    const old = isMedia(selected) ? selected : selected.querySelector(MEDIA_SEL);
+    const slot =
+        target.closest(FRAME_SELECTOR) ||
+        target.querySelector(FRAME_SELECTOR);
+
+    const old = slot
+        ? slot.querySelector(MEDIA_SEL)
+        : isMedia(target)
+            ? target
+            : target.querySelector(MEDIA_SEL);
+
     const replacement = makeMedia(item);
+
     dirty = true;
 
-    if (old && old.tagName === replacement.tagName) {
-      const previous = old.getAttribute('src');
-      const previousYouTube = old.getAttribute('data-yt');
-      const previousError = old.getAttribute('onerror');
+    function normalizeFrameMedia(el) {
+        if (!slot) return;
 
-      cms?.mark(old, 'media');
-      old.removeAttribute('onerror');
-      old.style.removeProperty('display');
-      old.src = replacement.src;
-      if (item.yt) old.dataset.yt = item.yt;
-      if (old.matches('video')) old.load();
+        el.removeAttribute('onerror');
 
-      undo.push({
-        run() {
-          for (const [name, value] of [['src', previous], ['data-yt', previousYouTube], ['onerror', previousError]]) {
-            if (value === null) old.removeAttribute(name);
-            else old.setAttribute(name, value);
-          }
-          if (old.matches('video')) old.load();
-        }
-      });
-    } else if (old) {
-      const skip = new Set(['src', 'onerror', 'controls', 'muted', 'loop', 'playsinline', 'preload', 'autoplay', 'poster', 'allow', 'allowfullscreen', 'referrerpolicy', 'title', 'data-yt', 'data-src', 'frameborder', 'alt']);
-      for (const attr of old.attributes) {
-        if (!skip.has(attr.name)) replacement.setAttribute(attr.name, attr.value);
-      }
+        el.style.removeProperty('translate');
+        el.style.removeProperty('transform');
+        el.style.removeProperty('z-index');
 
-      if (item.yt) {
-        const height = old.getBoundingClientRect().height;
-        replacement.style.border = '0';
-        replacement.style.display = 'block';
-        if (!replacement.style.width) replacement.style.width = '100%';
-        if (!replacement.style.height) {
-          replacement.style.height = height > 40 ? Math.round(height) + 'px' : 'auto';
-          if (height <= 40) replacement.style.aspectRatio = '16/9';
-        }
-      }
-
-      cms?.replace(old, replacement);
-      old.replaceWith(replacement);
-      undo.push({ run: () => replacement.replaceWith(old) });
-      select(replacement);
-    } else {
-      const slot = selected.matches('.ph,.slot,.op-frame') ? selected : selected.querySelector('.ph,.slot,.op-frame') || selected;
-      replacement.style.cssText = item.yt
-        ? 'display:block;width:100%;height:100%;border:0'
-        : 'display:block;width:100%;height:100%;object-fit:cover';
-      slot.append(replacement);
-      cms?.insert(replacement);
-      undo.push({ run: () => replacement.remove() });
-      select(replacement);
+        Object.assign(el.style, {
+            position: 'absolute',
+            inset: '0',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            maxWidth: 'none',
+            maxHeight: 'none',
+            margin: '0',
+            display: 'block',
+            objectFit: 'cover',
+            border: '0'
+        });
     }
+
+    function syncFrame(el) {
+        if (!slot) return;
+
+        const update = () => {
+            const ready = el.matches('img')
+                ? el.complete && el.naturalWidth > 0
+                : el.matches('video')
+                    ? el.readyState >= 1
+                    : true;
+
+            slot.classList.toggle('has-media', ready);
+        };
+
+        el.addEventListener('load', update);
+        el.addEventListener('loadedmetadata', update);
+
+        el.addEventListener('error', () => {
+            slot.classList.remove('has-media');
+        });
+
+        update();
+    }
+
+    if (old && old.tagName === replacement.tagName) {
+        const previous = old.getAttribute('src');
+        const previousStyle = old.getAttribute('style');
+        const previousYouTube = old.getAttribute('data-yt');
+        const previousError = old.getAttribute('onerror');
+
+        cms?.mark(old, 'media');
+
+        old.removeAttribute('onerror');
+        old.removeAttribute('data-src');
+        old.style.removeProperty('display');
+
+        normalizeFrameMedia(old);
+
+        old.src = replacement.src;
+
+        if (item.yt) {
+            old.dataset.yt = item.yt;
+        } else {
+            old.removeAttribute('data-yt');
+        }
+
+        if (old.matches('video')) {
+            old.load();
+        }
+
+        syncFrame(old);
+
+        undo.push({
+            run() {
+                const attrs = [
+                    ['src', previous],
+                    ['style', previousStyle],
+                    ['data-yt', previousYouTube],
+                    ['onerror', previousError]
+                ];
+
+                for (const [name, value] of attrs) {
+                    if (value === null) {
+                        old.removeAttribute(name);
+                    } else {
+                        old.setAttribute(name, value);
+                    }
+                }
+
+                if (old.matches('video')) {
+                    old.load();
+                }
+
+                syncFrame(old);
+            }
+        });
+
+        select(old);
+
+    } else if (old) {
+        const skip = new Set([
+            'src',
+            'onerror',
+            'controls',
+            'muted',
+            'loop',
+            'playsinline',
+            'preload',
+            'autoplay',
+            'poster',
+            'allow',
+            'allowfullscreen',
+            'referrerpolicy',
+            'title',
+            'data-yt',
+            'data-src',
+            'frameborder',
+            'alt'
+        ]);
+
+        for (const attr of old.attributes) {
+            if (!skip.has(attr.name)) {
+                replacement.setAttribute(
+                    attr.name,
+                    attr.value
+                );
+            }
+        }
+
+        normalizeFrameMedia(replacement);
+
+        cms?.replace(old, replacement);
+
+        old.replaceWith(replacement);
+
+        syncFrame(replacement);
+
+        undo.push({
+            run() {
+                replacement.replaceWith(old);
+                syncFrame(old);
+            }
+        });
+
+        select(replacement);
+
+    } else {
+        const host = slot || target;
+
+        if (slot) {
+            normalizeFrameMedia(replacement);
+        } else {
+            Object.assign(replacement.style, {
+                display: 'block',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+            });
+        }
+
+        host.append(replacement);
+
+        cms?.insert(replacement);
+
+        syncFrame(replacement);
+
+        undo.push({
+            run() {
+                replacement.remove();
+
+                if (slot) {
+                    slot.classList.remove('has-media');
+                }
+            }
+        });
+
+        select(replacement);
+    }
+
+    cms?.touch();
+
     refresh();
-  }
+
+    $('ed-msg').textContent = slot
+        ? 'Đã thay media bên trong frame animation.'
+        : 'Đã thay media.';
+}
 
   function removeSelected() {
     if (!selected) return;
@@ -688,14 +910,34 @@
         startEdit(el);
       }
       if (key === 'media') {
-        askMedia(item => {
-          const el = makeMedia(item);
-          el.style.height = area.height + 'px';
-          el.style.display = 'block';
-          if (!item.yt) el.style.objectFit = 'cover';
-          putInArea(el, area);
-        });
-      }
+
+    const targetFrame = findMediaFrame(area);
+
+    askMedia(item => {
+
+        // Nếu vùng chèn trùng với placeholder,
+        // thay ảnh trực tiếp trong frame gốc.
+        if (targetFrame && targetFrame.isConnected) {
+
+            replaceMedia(item, targetFrame);
+
+            return;
+        }
+
+        // Nếu không có placeholder,
+        // chèn một ảnh mới độc lập như bình thường.
+        const el = makeMedia(item);
+
+        el.style.height = area.height + 'px';
+        el.style.display = 'block';
+
+        if (!item.yt) {
+            el.style.objectFit = 'cover';
+        }
+
+        putInArea(el, area);
+    });
+}
     };
   }
 

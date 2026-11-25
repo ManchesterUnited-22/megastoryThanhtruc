@@ -485,3 +485,54 @@ main{position:relative;z-index:4}
 .slot > :is(img,video,iframe), .op-frame > :is(img,video,iframe) { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border:0; }
 .slot.has-media::before,.op-frame.has-media::before { display:none; }
 .inline-caption-scene #cap { opacity:0; }
+/* =========================================
+   MEDIA INSIDE ANIMATION FRAME
+   ========================================= */
+
+.slot,
+.ph {
+    position: relative;
+    overflow: hidden;
+}
+
+.op-frame {
+    overflow: hidden;
+}
+
+.slot > img,
+.slot > video,
+.slot > iframe,
+.op-frame > img,
+.op-frame > video,
+.op-frame > iframe,
+.ph > img,
+.ph > video,
+.ph > iframe {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: none;
+    max-height: none;
+
+    margin: 0;
+
+    object-fit: cover;
+
+    border: 0;
+}
+
+.slot.has-media::before,
+.op-frame.has-media::before,
+.ph.has-media::before {
+    display: none !important;
+}
+
+.slot > iframe,
+.op-frame > iframe,
+.ph > iframe {
+    display: block;
+}
